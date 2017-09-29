@@ -97,5 +97,12 @@ class BossAnalyzer(object):
     def get_player_death_number(self):
         return {player: i+1 for i, player in enumerate(self.get_player_death_order())}
 
+    def get_wipe_time(self, number_of_deaths=7):
+        death_order = self.get_player_death_order()
+        death_time = None
+        if len(death_order) > 7:
+            death_time = self.get_player_death_times().get(death_order[7])
+        return death_time
+
     def analyze(self):
         raise NotImplementedError()

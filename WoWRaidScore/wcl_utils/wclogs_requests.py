@@ -154,7 +154,6 @@ class WCLRequests(object):
             end_time=end_time,
             additional=additional_data
         )
-        print(url)
         json_data = None
         attempts = 3
         while not json_data and attempts > 0:

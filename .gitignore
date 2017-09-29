@@ -1,2 +1,4 @@
 
 wow_raid_score/settings.py
+db.sqlite3
+.idea/

@@ -33,11 +33,11 @@
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="settings.py" pinned="false" current-in-tab="true">
-        <entry file="file://$PROJECT_DIR$/wow_raid_score/settings.py">
+      <file leaf-file-name="settings2.py" pinned="false" current-in-tab="true">
+        <entry file="file://$PROJECT_DIR$/wow_raid_score/settings2.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="352">
-              <caret line="22" column="64" lean-forward="true" selection-start-line="22" selection-start-column="64" selection-end-line="22" selection-end-column="64" />
+            <state relative-caret-position="0">
+              <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
               <folding />
             </state>
           </provider>
@@ -188,6 +188,11 @@
           <expand>
             <path>
               <item name="wow_raid_score" type="b2602c69:ProjectViewProjectNode" />
+              <item name="wow_raid_score" type="462c0819:PsiDirectoryNode" />
+            </path>
+            <path>
+              <item name="wow_raid_score" type="b2602c69:ProjectViewProjectNode" />
+              <item name="wow_raid_score" type="462c0819:PsiDirectoryNode" />
               <item name="wow_raid_score" type="462c0819:PsiDirectoryNode" />
             </path>
           </expand>
@@ -527,6 +532,14 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="352">
           <caret line="22" column="64" lean-forward="true" selection-start-line="22" selection-start-column="64" selection-end-line="22" selection-end-column="64" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/wow_raid_score/settings2.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="0">
+          <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
           <folding />
         </state>
       </provider>

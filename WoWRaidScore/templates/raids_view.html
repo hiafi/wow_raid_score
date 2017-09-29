@@ -1,0 +1,6 @@
+{% extends 'base_template.html' %}
+{% block content %}
+    {% for raid in raids %}
+    <div><a href="/{{raid.raid_id}}/">{{ raid }}</a></div>
+    {% endfor %}
+{% endblock %}

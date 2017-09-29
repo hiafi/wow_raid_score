@@ -1,0 +1,82 @@
+{% extends 'base_template.html' %}
+{% load dict_lookup %}
+{% block content %}
+
+    <div>{{ player.safe_name }}</div> <br />
+    <div>{{ boss.grouper }}</div>
+    <table class="score_table">
+        <tr>
+            <th></th>
+            <th>Total</th>
+            {% for header in score_objs.0.table_keys %}
+                <th>{{header}}</th>
+            {% endfor %}
+        </tr>
+
+        {% for score_obj in score_objs %}
+        <tr>
+            <td> Attempt {{score_obj.fight.attempt}} </td>
+            <td> {{score_obj.total }} </td>
+            {% for header in score_objs.0.table_keys %}
+                <td>
+                    {{ score_obj.score_dict|get_item:header}}
+                </td>
+            {% endfor %}
+        </tr>
+        {% endfor %}
+
+        <tr>
+            <td>Totals</td>
+            <td>{{ total_dict|get_item:"Total"}}</td>
+            {% for header in score_objs.0.table_keys %}
+                <td>{{ total_dict|get_item:header}}</td>
+            {% endfor %}
+        </tr>
+    </table>
+
+
+<canvas id="myChart" width="400" height="200"></canvas>
+<script>
+var scores = {{totals}};
+var health = {{health}};
+var n = {{totals|length}};
+var labels = [];
+for (var i = 0; i < n; i++) {
+  labels.push(i+1);
+}
+var ctx = document.getElementById("myChart").getContext('2d');
+var myChart = new Chart(ctx, {
+    type: 'line',
+    data: {
+        labels: labels,
+        datasets: [{
+            data: scores,
+            label: "{{player.safe_name}}",
+            fill: false,
+            borderColor: "#3cba9f",
+        },
+        {
+            data: health,
+            label: "Boss health",
+            fill: false,
+            borderColor: "#ff626b",
+        }
+        ]
+    },
+    options: {
+        responsive: true,
+        tooltips: {
+            mode: 'index',
+            intersect: false
+        },
+        hover: {
+            mode: 'nearest',
+            intersect: true
+        }
+    }
+
+});
+</script>
+
+
+{% endblock %}

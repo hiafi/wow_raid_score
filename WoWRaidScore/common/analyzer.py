@@ -23,8 +23,24 @@ class BossAnalyzer(object):
     def cleanup(self):
         self._cached_deaths = {}
 
-    def distance_calculation(self, coord1, coord2):
+    @staticmethod
+    def distance_calculation(coord1, coord2):
         return math.sqrt(math.pow(coord2[0] - coord1[0], 2) + math.pow(coord2[1] - coord1[1], 2))
+
+    @staticmethod
+    def between_duration(start_time, end_time, time_to_check):
+        return start_time <= time_to_check <= end_time
+
+    def check_for_wipe(self, event, death_count=None, time_count=None):
+        death_time = self.wcl_fight.end_time_str
+        wipe_time = self.wcl_fight.end_time_str
+        if self.wcl_fight.percent >= 20.00:
+            death_time = self.get_wipe_time(death_count)
+            if time_count is None:
+                wipe_time = self.wcl_fight.end_time_str - int((self.wcl_fight.end_time_str - self.wcl_fight.start_time_str) * 0.8)
+        if event.timestamp > death_time or event.timestamp > wipe_time:
+            return True
+        return False
 
     @classmethod
     def create_raid_scores(cls, players, fight, specs):
@@ -97,11 +113,13 @@ class BossAnalyzer(object):
     def get_player_death_number(self):
         return {player: i+1 for i, player in enumerate(self.get_player_death_order())}
 
-    def get_wipe_time(self, number_of_deaths=7):
+    def get_wipe_time(self, number_of_deaths=None):
+        if number_of_deaths is None:
+            number_of_deaths = int(len(self.score_objs) * 0.35)
         death_order = self.get_player_death_order()
         death_time = None
-        if len(death_order) > 7:
-            death_time = self.get_player_death_times().get(death_order[7])
+        if len(death_order) > number_of_deaths:
+            death_time = self.get_player_death_times().get(death_order[number_of_deaths])
         return death_time
 
     def analyze(self):

@@ -25,7 +25,7 @@ class MaidenAnalyzer(BossAnalyzer):
         colors = {}
         positions = {}
         already_counted = {}
-        death_time = self.get_wipe_time(7)
+        death_time = self.get_wipe_time()
         for event in self.client.get_events(self.wcl_fight,
                                             filters=[{
                                                 "type": WCLEventTypes.damage,
@@ -35,7 +35,7 @@ class MaidenAnalyzer(BossAnalyzer):
                                                 "ability.name": ["Fel Infusion", "Light Infusion"]
                                             },
                                             ], actors_obj_dict=self.actors):
-            if death_time and event.timestamp > death_time:
+            if self.check_for_wipe(event):
                 return
             if event.type == WCLEventTypes.apply_debuff:
                 if event.name == "Fel Infusion":
@@ -64,8 +64,6 @@ class MaidenAnalyzer(BossAnalyzer):
                     score_obj = self.score_objs.get(event.target)
                     score_obj.wrong_color -= 50
                     already_counted[event.target] = event.timestamp
-
-
 
     def blow_up_early(self):
         pass

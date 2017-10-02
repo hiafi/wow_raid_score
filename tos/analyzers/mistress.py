@@ -149,13 +149,22 @@ class MistressAnalyzer(BossAnalyzer):
             score_obj.stacked_hydra_shots -= 50
 
     def stupid_damage(self):
-        death_numbers = self.get_player_death_number()
+        bufferfish = self._bufferfish_durations()
         for event in self.client.get_events(self.wcl_fight,
                                             filters={
                                                 "type": [WCLEventTypes.apply_debuff],
                                                 "ability.name": "Slicing Tornado"
                                             }, actors_obj_dict=self.actors):
-            if death_numbers.get(event.target, 1) < self.STOP_AT_DEATH:
+            valid = True
+            if self.check_for_wipe(event):
+                bufferfish_for_player = bufferfish.get(event.target)
+                for bf_time in bufferfish_for_player:
+                    if self.between_duration(bf_time[0], bf_time[1], event.timestamp):
+                        valid = False
+            else:
+                valid = False
+
+            if valid:
                 score_obj = self.score_objs.get(event.target)
                 score_obj.tornado_damage -= 40
         for event in self.client.get_events(self.wcl_fight,
@@ -163,7 +172,7 @@ class MistressAnalyzer(BossAnalyzer):
                                                 "type": [WCLEventTypes.damage],
                                                 "ability.name": "Crashing Wave"
                                             }, actors_obj_dict=self.actors):
-            if death_numbers.get(event.target, 1) < self.STOP_AT_DEATH:
+            if self.check_for_wipe(event):
                 score_obj = self.score_objs.get(event.target)
                 score_obj.hit_by_giant_fish -= 60
 

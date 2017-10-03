@@ -32,7 +32,7 @@ def _get_avg_scores(score_objs):
 def _sort_avg_scores(avg_scores):
     new_scores = {}
     for boss, score_dict in avg_scores.items():
-        new_scores[boss] = sorted([(score, player, boss) for player, score in score_dict.items()], reverse=True)
+        new_scores[boss] = sorted([(score, player, boss) for player, score in score_dict.items()], reverse=True, key=lambda x: x[0])
     boss_order = new_scores.keys()
     transposed_table = [[b for b in boss_order]]
     for index in range(max([len(new_scores[b]) for b in boss_order])):

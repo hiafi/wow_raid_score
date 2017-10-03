@@ -38,7 +38,7 @@ class BossAnalyzer(object):
             death_time = self.get_wipe_time(death_count)
             if time_count is None:
                 wipe_time = self.wcl_fight.end_time_str - int((self.wcl_fight.end_time_str - self.wcl_fight.start_time_str) * 0.8)
-        if event.timestamp > death_time or event.timestamp > wipe_time:
+        if (death_time and event.timestamp > death_time) or (wipe_time and event.timestamp > wipe_time):
             return True
         return False
 

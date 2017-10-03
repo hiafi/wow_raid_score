@@ -158,9 +158,10 @@ class MistressAnalyzer(BossAnalyzer):
             valid = True
             if self.check_for_wipe(event):
                 bufferfish_for_player = bufferfish.get(event.target)
-                for bf_time in bufferfish_for_player:
-                    if self.between_duration(bf_time[0], bf_time[1], event.timestamp):
-                        valid = False
+                if bufferfish_for_player:
+                    for bf_time in bufferfish_for_player:
+                        if self.between_duration(bf_time[0], bf_time[1], event.timestamp):
+                            valid = False
             else:
                 valid = False
 

@@ -11,7 +11,6 @@ class MaidenAnalyzer(BossAnalyzer):
         self.wrong_color()
         self.wrong_orb()
         self.blow_up_early()
-        asdf
         # self.cleanup()
         # self.save_score_objs()
 

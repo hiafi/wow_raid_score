@@ -2,15 +2,16 @@
 from WoWRaidScore.common.analyzer import BossAnalyzer
 from tos.models import MaidenScore
 from WoWRaidScore.wcl_utils.wcl_data_objs import WCLEventTypes
+from collections import defaultdict
 
 
 class MaidenAnalyzer(BossAnalyzer):
     SCORE_OBJ = MaidenScore
 
     def analyze(self):
-        self.wrong_color()
+        # self.wrong_color()
         self.wrong_orb()
-        self.blow_up_early()
+        # self.blow_up_early()
         # self.cleanup()
         # self.save_score_objs()
 
@@ -24,7 +25,6 @@ class MaidenAnalyzer(BossAnalyzer):
         colors = {}
         positions = {}
         already_counted = {}
-        death_time = self.get_wipe_time()
         for event in self.client.get_events(self.wcl_fight,
                                             filters=[{
                                                 "type": WCLEventTypes.damage,
@@ -54,8 +54,6 @@ class MaidenAnalyzer(BossAnalyzer):
                 for player, position in positions.items():
                     if player == event.target:
                         continue
-                    if event.target.safe_name == "Satanbeard":
-                        print(event.target, colors.get(event.target), player, colors.get(player), self.distance_calculation(event_position, position))
                     if colors.get(player) is not None and colors.get(event.target) is not None and colors.get(player) != colors.get(event.target):
                         if self.distance_calculation(event_position, position) < 1000:
                             close_mismatch += 1
@@ -65,7 +63,30 @@ class MaidenAnalyzer(BossAnalyzer):
                     already_counted[event.target] = event.timestamp
 
     def blow_up_early(self):
-        pass
+        damage_dealt = defaultdict(int)
+        for event in self.client.get_events(self.wcl_fight,
+                                            filters={
+                                                "type": WCLEventTypes.damage,
+                                                "ability.id": "235138"
+                                            }, actors_obj_dict=self.actors):
+            damage_dealt[event.source] += event.damage_total
+        for player, damage_done in damage_dealt.items():
+            score_obj = self.score_objs.get(player)
+            score_obj.didnt_jump_in_hole = int(damage_done / -500000.0)
 
     def wrong_orb(self):
-        pass
+        locations = {}
+        wrath_name = "Wrath of the Creators"
+        for event in self.client.get_events(self.wcl_fight,
+                                            filters=[{
+                                                "type": WCLEventTypes.damage,
+                                                "ability.name": wrath_name
+                                            }, {
+                                                "type": [WCLEventTypes.apply_debuff],
+                                                "ability.name": ["Unstable Soul"]
+                                            },
+                                            ], actors_obj_dict=self.actors):
+            if event.name == wrath_name:
+                locations[event.target] = event.location
+            else:
+                print(event, locations)

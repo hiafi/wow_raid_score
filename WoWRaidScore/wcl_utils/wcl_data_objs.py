@@ -190,6 +190,10 @@ class WCLDamageEvent(WCLAbilityEventObj):
         self.hit_type = data.get("hitType")
         self.damage_total = data.get("amount") + data.get("absorbed")
 
+    @property
+    def location(self):
+        return (self.point_x, self.point_y)
+
     def __str__(self):
         return "<WCLDamageEvent{} {} {}->{} for {} damage. ({})>".format(" (tick)" if self.tick else "", self.name,
                                                                          self.safe_source, self.safe_target,

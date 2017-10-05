@@ -3,12 +3,15 @@ from __future__ import unicode_literals
 
 from collections import defaultdict
 
-from django.core.exceptions import ObjectDoesNotExist
 from django.shortcuts import render
+from django.http import HttpResponse
 
-from WoWRaidScore.common.analyzer_builder import build_analyzers
 from WoWRaidScore.models import Raid, Fight, RaidScore, Player, Boss
-from WoWRaidScore.wcl_utils.wclogs_requests import WCLRequests
+from WoWRaidScore.tasks import parse_task, parse_raid_task
+
+from celery.result import AsyncResult
+
+import json
 
 
 # Create your views here.
@@ -70,23 +73,23 @@ def view_player_details_for_raid(request, raid_id, player_id, boss_id):
     for score_obj in score_objs:
         totals["Total"] += score_obj.total
 
-    return render(request, "player_raid_view.html", {"player": player, "score_objs": score_objs, "totals": total_list, "health": health_list, "total_dict": totals})
+    context = {"player": player, "score_objs": score_objs, "totals": total_list,
+               "health": health_list, "total_dict": totals}
+    return render(request, "player_raid_view.html", context)
 
 
-def parse(request, raid_id):
-    wcl_client = WCLRequests(raid_id)
-    try:
-        raid = Raid.objects.get(raid_id=raid_id)
-        for fight in Fight.objects.filter(raid=raid):
-            for raid_score in RaidScore.objects.filter(fight=fight):
-                raid_score.delete()
-            fight.delete()
-    except ObjectDoesNotExist:
-        wcl_raid = wcl_client.get_raid_info()
-        raid = Raid(raid_id=raid_id, time=wcl_raid.start_time)
-        raid.save()
-    fights = wcl_client.get_fights()
-    analyzers = build_analyzers(fights, raid, wcl_client)
-    for analyzer in analyzers:
-        analyzer.analyze()
+def parse_raid(request, raid_id):
+    parse_task.apply_async((raid_id,), task_id=raid_id)
+    return render(request, 'parse.html', {})
+
+
+def view_parse_progress(request, raid_id):
+    task = AsyncResult(raid_id)
+    data = task.result or task.state
+    json_data = json.dumps(data)
+    return HttpResponse(json_data, content_type='application/json')
+
+
+def parse_raid_legacy(request, raid_id):
+    parse_raid_task(raid_id)
     return render(request, 'parse.html', {})

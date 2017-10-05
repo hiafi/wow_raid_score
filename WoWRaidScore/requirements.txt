@@ -1,0 +1,4 @@
+Unidecode
+requests
+django-model-utils
+celery

@@ -6,7 +6,7 @@ tos_fights = {
     # 2032: GorothAnalyzer,
     # 2048: DI,
     # 2036: Harj,
-    # 2037: MistressAnalyzer,
+    2037: MistressAnalyzer,
     # 2050: Sisters,
     # 2054: Host,
     2052: MaidenAnalyzer,

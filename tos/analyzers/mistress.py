@@ -18,6 +18,8 @@ class MistressAnalyzer(BossAnalyzer):
             self.shadow_dropoffs()
         self.stupid_damage()
         self.hydra_shots()
+        self.interrupts()
+        self.dispels()
 
         self.cleanup()
         self.save_score_objs()
@@ -142,8 +144,8 @@ class MistressAnalyzer(BossAnalyzer):
 
         for event in self.client.get_events(self.wcl_fight,
                                             filters={
-                                                "type": WCLEventTypes.apply_debuff_stack,
-                                                "ability.name": "Hydra Acid"
+                                                "type": WCLEventTypes.apply_debuff,
+                                                "ability.id": "234332"
                                             }, actors_obj_dict=self.actors):
             score_obj = self.score_objs.get(event.target)
             score_obj.stacked_hydra_shots -= 50
@@ -176,4 +178,27 @@ class MistressAnalyzer(BossAnalyzer):
             if self.check_for_wipe(event):
                 score_obj = self.score_objs.get(event.target)
                 score_obj.hit_by_giant_fish -= 60
+
+    def interrupts(self):
+        for event in self.client.get_events(self.wcl_fight,
+                                            filters={
+                                                "type": [WCLEventTypes.interrupt],
+                                                "target.name": ["Razorjaw Waverunner", "Abyss Stalker"]
+                                            }, actors_obj_dict=self.actors):
+            score_obj = self.score_objs.get(event.source)
+            if event.target.name == "Abyss Stalker":
+                score_obj.interrupts += 1 if score_obj.melee_dps else 2
+            if event.target.name == "Razorjaw Waverunner":
+                score_obj.interrupts += 2 if score_obj.melee_dps else 3
+
+    def dispels(self):
+        for event in self.client.get_events(self.wcl_fight,
+                                            filters={
+                                                "type": [WCLEventTypes.dispel],
+                                            }, actors_obj_dict=self.actors):
+            score_obj = self.score_objs.get(event.source)
+            if event.name in ("Revival", "Mass Dispel"):
+                score_obj.dispels += 1
+            else:
+                score_obj.dispels += 2
 

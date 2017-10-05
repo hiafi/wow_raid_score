@@ -6,6 +6,8 @@ class WCLEventTypes(object):
     apply_debuff = "applydebuff"
     apply_debuff_stack = "applydebuffstack"
     remove_debuff = "removedebuff"
+    interrupt = "interrupt"
+    dispel = "dispel"
     damage = "damage"
     death = "death"
     cast = "cast"
@@ -178,6 +180,14 @@ class WCLApplyDebuffStackEvent(WCLAbilityEventObj):
 
 
 class WCLRemoveDebuffEvent(WCLAbilityEventObj):
+    pass
+
+
+class WCLInterruptEvent(WCLAbilityEventObj):
+    pass
+
+
+class WCLDispelEvent(WCLAbilityEventObj):
     pass
 
 

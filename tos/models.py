@@ -36,12 +36,14 @@ class MistressScore(RaidScore):
     hydra_shots = models.IntegerField(default=0)
     stacked_hydra_shots = models.IntegerField(default=0)
     murlock_debuff_uptime = models.IntegerField(default=0)
+    interrupts = models.IntegerField(default=0)
+    dispels = models.IntegerField(default=0)
 
     @property
     def table_keys(self):
         return [
             "Tornado Damage", "Stacked Hydra Shots", "Missed Hydra Shots", "Hit by the giant fish",
-            "Shadow Dropoffs", "Murlock debuff uptime", "Bufferfish Uptime"
+            "Shadow Dropoffs", "Murlock debuff uptime", "Bufferfish Uptime", "Interrupts", "Dispels"
         ]
 
     @property
@@ -49,7 +51,8 @@ class MistressScore(RaidScore):
         return {
             "Bufferfish Uptime": self.bufferfish_uptime, "Shadow Dropoffs": self.dropoffs,
             "Tornado Damage": self.tornado_damage, "Stacked Hydra Shots": self.stacked_hydra_shots, "Hit by the giant fish": self.hit_by_giant_fish,
-            "Missed Hydra Shots": self.hydra_shots, "Murlock debuff uptime": self.murlock_debuff_uptime
+            "Missed Hydra Shots": self.hydra_shots, "Murlock debuff uptime": self.murlock_debuff_uptime,
+            "Interrupts": self.interrupts, "Dispels": self.dispels
         }
 
 

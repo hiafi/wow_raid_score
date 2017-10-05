@@ -3,7 +3,8 @@ import time
 from datetime import datetime
 
 from WoWRaidScore.wcl_utils.wcl_data_objs import WCLEventTypes, WCLRaid, WCLFight, WCLPlayer, WCLApplyDebuffEvent, \
-    WCLDamageEvent, WCLEnemy, WCLRemoveDebuffEvent, WCLDeathEvent, WCLCastEvent, WCLPlayerFightInfo, WCLApplyDebuffStackEvent
+    WCLDamageEvent, WCLEnemy, WCLRemoveDebuffEvent, WCLDeathEvent, WCLCastEvent, WCLPlayerFightInfo, \
+    WCLApplyDebuffStackEvent, WCLInterruptEvent, WCLDispelEvent
 
 from collections import defaultdict
 
@@ -84,7 +85,7 @@ class WCLRequests(object):
     def get_fights(self):
         url = "{}/report/fights/{code}?api_key={api_key}".format(WCLRequests.base_url(), code=self.raid_id,
                                                                  api_key=API_KEY)
-        r_json = requests.get(url).json()
+        r_json = self._get_json_data_from_wcl(url)
 
         wcl_players = WCLRequests._get_players(r_json)
         wcl_enemies = WCLRequests._get_enemies(r_json)
@@ -97,7 +98,7 @@ class WCLRequests(object):
     def get_raid_info(self):
         url = "{}/report/fights/{code}?api_key={api_key}".format(WCLRequests.base_url(), code=self.raid_id,
                                                                  api_key=API_KEY)
-        r_json = requests.get(url).json()
+        r_json = self._get_json_data_from_wcl(url)
         return WCLRaid(r_json)
 
     @staticmethod
@@ -125,13 +126,16 @@ class WCLRequests(object):
                                                   filter_name, filter_value in filters.items()]))
         return ""
 
-    def _create_event_obj(self, data, actors_obj_dict):
+    @staticmethod
+    def _create_event_obj(data, actors_obj_dict):
         types = {
             WCLEventTypes.apply_debuff: WCLApplyDebuffEvent,
             WCLEventTypes.apply_debuff_stack: WCLApplyDebuffStackEvent,
             WCLEventTypes.remove_debuff: WCLRemoveDebuffEvent,
             WCLEventTypes.damage: WCLDamageEvent,
+            WCLEventTypes.interrupt: WCLInterruptEvent,
             WCLEventTypes.death: WCLDeathEvent,
+            WCLEventTypes.dispel: WCLDispelEvent,
             WCLEventTypes.cast: WCLCastEvent,
             WCLEventTypes.combatant_info: WCLPlayerFightInfo
 
@@ -140,6 +144,22 @@ class WCLRequests(object):
         if cls:
             return cls(data, actors_obj_dict)
         return data
+
+    def _get_json_data_from_wcl(self, url, max_attempts=5):
+        json_data = None
+        attempts = max_attempts
+        while not json_data and attempts > 0:
+            response = requests.get(url)
+            attempts -= 1
+            if response.status_code != 200:
+                print(datetime.now(), response.status_code, response.text)
+                if attempts > 0:
+                    time.sleep((max_attempts - attempts) * 60)
+            else:
+                json_data = response.json()
+        if not json_data:
+            raise Exception("Unable to get data")
+        return json_data
 
     def _get_event_json(self, start_time, end_time, actor_id, filters):
         additional_data = "{actor_id}{filter}".format(
@@ -154,20 +174,7 @@ class WCLRequests(object):
             end_time=end_time,
             additional=additional_data
         )
-        json_data = None
-        attempts = 3
-        while not json_data and attempts > 0:
-            response = requests.get(url)
-            attempts -= 1
-            if response.status_code != 200:
-                print(datetime.now(), response.status_code, response.text)
-                if attempts > 0:
-                    time.sleep((3 - attempts) * 60)
-            else:
-                json_data = response.json()
-        if not json_data:
-            raise Exception("Unable to get event data")
-        return json_data
+        return self._get_json_data_from_wcl(url)
 
     def get_events(self, fight, actor_id=None, filters=None, actors_obj_dict=None):
         r_json = self._get_event_json(fight.start_time_str, fight.end_time_str, actor_id, filters)

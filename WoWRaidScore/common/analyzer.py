@@ -4,6 +4,44 @@ from WoWRaidScore.wcl_utils.wcl_data_objs import WCLEventTypes
 import math
 
 
+class SpecInfo(object):
+    DH_VENG = None
+    DH_HAVOC = None
+    DK_BLOOD = 250
+    DK_FROST = 251
+    DK_UNHOLY = None
+    DRUID_GUARDIAN = 104
+    DRUID_BALANCE = 102
+    DRUID_FERAL = None
+    DRUID_RESTO = 105
+    HUNTER_BM = None
+    HUNTER_MM = None
+    HUNTER_SV = None
+    MAGE_ARCANE = None
+    MAGE_FIRE = None
+    MAGE_FROST = None
+    MONK_MW = 270
+    MONK_BM = 268
+    MONK_WW = 269
+    PALADIN_HOLY = None
+    PALADIN_RET = None
+    PALADIN_PROT = None
+    PRIEST_HOLY = 257
+    PRIEST_DISC = None
+    PRIEST_SHADOW = 258
+    ROGUE_SUB = 261
+    ROGUE_ASS = None
+    SHAMAN_RESTO = 264
+    SHAMAN_ELE = None
+    SHAMAN_ENH = 263
+    WARLOCK_AFF = None
+    WARLOCK_DESTR = None
+    WARLOCK_DEMO = None
+    WARRIOR_PROT = None
+    WARRIOR_ARMS = 72
+    WARRIOR_FURY = None
+
+
 class BossAnalyzer(object):
     SCORE_OBJ = RaidScore
     STOP_AT_DEATH = 7
@@ -60,11 +98,11 @@ class BossAnalyzer(object):
             70,
             71,
             577,
-            263,  # Enh Shaman
-            269,  # WW monk
-            72,  # Arms war
-            251,  # Frost DK
-            261,  # sub rogue
+            SpecInfo.SHAMAN_ENH,  # Enh Shaman
+            SpecInfo.MONK_WW,  # WW monk
+            SpecInfo.WARRIOR_ARMS,  # Arms war
+            SpecInfo.DK_FROST,  # Frost DK
+            SpecInfo.ROGUE_SUB,  # sub rogue
         }
         ranged_dps_specs = {
             258,  #
@@ -76,14 +114,20 @@ class BossAnalyzer(object):
             262,  # Ele shaman
         }
         healer_specs = {
-            257,  # h priest
-            270,  # MW monk
-            105,  # r druid
-            264  # r shaman
+            SpecInfo.DRUID_RESTO,
+            SpecInfo.MONK_MW,
+            SpecInfo.SHAMAN_RESTO,
+            SpecInfo.PALADIN_HOLY,
+            SpecInfo.PRIEST_HOLY,
+            SpecInfo.PRIEST_DISC,
         }
         tank_specs = {
-            268,  # BM monk
-            104  # druid
+            SpecInfo.MONK_BM,  # BM monk
+            SpecInfo.DRUID_GUARDIAN,  # druid
+            SpecInfo.DK_BLOOD,  # blood dk
+            SpecInfo.WARRIOR_PROT,  # blood dk
+            SpecInfo.PALADIN_PROT,  # blood dk
+            SpecInfo.DH_VENG,  # blood dk
         }
         if spec not in melee_dps_specs and spec not in ranged_dps_specs and spec not in healer_specs and spec not in tank_specs:
             print("Unable to find spec {} ({})".format(spec, player.safe_name))

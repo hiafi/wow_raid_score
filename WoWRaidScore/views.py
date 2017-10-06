@@ -12,7 +12,9 @@ from WoWRaidScore.tasks import parse_task, parse_raid_task
 from celery.result import AsyncResult
 
 import json
+import logging
 
+logger = logging.getLogger(__name__)
 
 # Create your views here.
 
@@ -107,6 +109,8 @@ def parse_raid(request):
 
 def view_parse_progress(request, raid_id):
     task = AsyncResult(raid_id)
+    logger.info(task.result)
+    logger.info(task.status)
     if task.result:
         data = task.result
     else:

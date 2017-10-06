@@ -127,5 +127,5 @@ def parse_raid_legacy(request, raid_id):
 def start_parse(request):
     if request.method == 'POST':
         raid_id = request.POST.get("raid_id")
-        # parse_task.apply_async((raid_id,), task_id=raid_id)
+        parse_task.apply_async((raid_id,), task_id=raid_id)
         return HttpResponse({}, content_type='application/json')

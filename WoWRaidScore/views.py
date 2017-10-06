@@ -113,6 +113,8 @@ def view_parse_progress(request, raid_id):
     logger.info(task.status)
     if task.result:
         data = task.result
+    elif task.successful():
+        data = {"process_percent": 100}
     else:
         data = {"process_percent": 0}
     json_data = json.dumps(data)

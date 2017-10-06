@@ -23,10 +23,18 @@ def xsum(numbers):
 def parse_task(raid_id):
     parse_raid_task(raid_id)
 
+def update_status(progress, update_progress=True):
+    if update_progress:
+        current_task.update_state(state='PROGRESS', meta={'process_percent': progress})
 
-def parse_raid_task(raid_id):
+
+def get_progress(current_analyzer, num_analyzers):
+    return int(float(current_analyzer) / num_analyzers * 90.0)
+
+
+def parse_raid_task(raid_id, update_progress=True):
     wcl_client = WCLRequests(raid_id)
-    progress = 0.0
+    update_status(0.0, update_progress)
     try:
         raid = Raid.objects.get(raid_id=raid_id)
         for fight in Fight.objects.filter(raid=raid):
@@ -37,12 +45,16 @@ def parse_raid_task(raid_id):
         wcl_raid = wcl_client.get_raid_info()
         raid = Raid(raid_id=raid_id, time=wcl_raid.start_time)
         raid.save()
-    progress = 10.0
+    update_status(2.0, update_progress)
     fights = wcl_client.get_fights()
+    update_status(5.0, update_progress)
     analyzers = build_analyzers(fights, raid, wcl_client)
+    update_status(10.0, update_progress)
     num_analyzers = len(analyzers)
     for index, analyzer in enumerate(analyzers):
         analyzer.analyze()
-        current_task.update_state(state='PROGRESS', meta={'process_percent': num_analyzers})
+        progress = 10.0 + get_progress(index, num_analyzers)
+        update_status(progress, update_progress)
+
 
 

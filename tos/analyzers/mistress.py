@@ -7,6 +7,7 @@ from collections import defaultdict
 
 class MistressAnalyzer(BossAnalyzer):
     SCORE_OBJ = MistressScore
+    STOP_AT_DEATH = 4
 
     def analyze(self):
         print("Processing {}".format(self.wcl_fight))
@@ -158,7 +159,7 @@ class MistressAnalyzer(BossAnalyzer):
                                                 "ability.name": "Slicing Tornado"
                                             }, actors_obj_dict=self.actors):
             valid = True
-            if self.check_for_wipe(event):
+            if not self.check_for_wipe(event):
                 bufferfish_for_player = bufferfish.get(event.target)
                 if bufferfish_for_player:
                     for bf_time in bufferfish_for_player:
@@ -175,7 +176,7 @@ class MistressAnalyzer(BossAnalyzer):
                                                 "type": [WCLEventTypes.damage],
                                                 "ability.name": "Crashing Wave"
                                             }, actors_obj_dict=self.actors):
-            if self.check_for_wipe(event):
+            if not self.check_for_wipe(event):
                 score_obj = self.score_objs.get(event.target)
                 score_obj.hit_by_giant_fish -= 60
 

@@ -69,13 +69,24 @@ class BossAnalyzer(object):
     def between_duration(start_time, end_time, time_to_check):
         return start_time <= time_to_check <= end_time
 
-    def check_for_wipe(self, event, death_count=None, time_count=None):
+    def check_for_wipe(self, event, death_count=None, time_count=None, ignore_percent=20.0):
+        """
+        Returns if it is a wipe
+        :param event:
+        :param death_count:
+        :param time_count:
+        :param ignore_percent:
+        :return: True if it is a wipe, False otherwise
+        """
         death_time = self.wcl_fight.end_time_str
         wipe_time = self.wcl_fight.end_time_str
-        if self.wcl_fight.percent >= 20.00:
+        if self.wcl_fight.percent >= ignore_percent:
             death_time = self.get_wipe_time(death_count)
+            last_twenty = int((self.wcl_fight.end_time_str - self.wcl_fight.start_time_str) * 0.2)
             if time_count is None:
-                wipe_time = self.wcl_fight.end_time_str - int((self.wcl_fight.end_time_str - self.wcl_fight.start_time_str) * 0.8)
+                wipe_time = self.wcl_fight.end_time_str - max(20000, last_twenty)
+            else:
+                wipe_time = self.wcl_fight.end_time_str - time_count
         if (death_time and event.timestamp > death_time) or (wipe_time and event.timestamp > wipe_time):
             return True
         return False

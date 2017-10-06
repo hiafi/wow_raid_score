@@ -85,11 +85,11 @@ def parse_raid(request, raid_id):
 
 def view_parse_progress(request, raid_id):
     task = AsyncResult(raid_id)
-    data = task.result or task.state
+    data = {"result": task.result, "state": task.state}
     json_data = json.dumps(data)
     return HttpResponse(json_data, content_type='application/json')
 
 
 def parse_raid_legacy(request, raid_id):
-    parse_raid_task(raid_id)
+    parse_raid_task(raid_id, update_progress=False)
     return render(request, 'parse.html', {})

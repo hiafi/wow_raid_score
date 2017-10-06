@@ -49,7 +49,7 @@ class MistressAnalyzer(BossAnalyzer):
                 start_time, end_time = uptime
                 try:
                     duration = (end_time - start_time)
-                    score_obj.bufferfish_uptime += int((duration / 1000 - 15) / 10)
+                    score_obj.bufferfish_uptime += int((duration / 10000))
                 except TypeError:
                     pass
 
@@ -85,6 +85,7 @@ class MistressAnalyzer(BossAnalyzer):
     def shadow_dropoffs(self):
         debuff_dict = {}
         dropoffs = defaultdict(int)
+        failed_drops = defaultdict(int)
 
         for event in self.client.get_events(self.wcl_fight,
                                             filters={
@@ -98,10 +99,12 @@ class MistressAnalyzer(BossAnalyzer):
                 duration = event.timestamp - start_time
                 if duration < 5900:
                     dropoffs[event.target] += 1
+                else:
+                    failed_drops[event.target] += 1
 
         for target, dropoffs in dropoffs.items():
             score_obj = self.score_objs.get(target)
-            score_obj.dropoffs = dropoffs * 10
+            score_obj.dropoffs = dropoffs * 5 - failed_drops.get(target, 0) * -1
 
     def remove_from_set(self, player, player_set):
         try:

@@ -47,6 +47,27 @@ def _sort_avg_scores(avg_scores):
     return transposed_table
 
 
+def _get_totals(score_objs):
+    totals = defaultdict(lambda: defaultdict(int))
+    keys_dict = {}
+    final_totals = defaultdict(list)
+    print(len(score_objs))
+    for score_obj in score_objs:
+        for name, val in score_obj.score_dict.items():
+            if score_obj.fight.boss not in keys_dict:
+                keys_dict[score_obj.fight.boss] = score_obj.table_keys
+            totals[score_obj.fight.boss][name] += val
+    print(totals)
+    for boss, fight_scores_dict in totals.items():
+        keys = keys_dict.get(boss)
+        final_totals[boss].append(keys)
+        ft = []
+        for key in keys:
+            ft.append(fight_scores_dict.get(key))
+        final_totals[boss].append(ft)
+    return dict(final_totals)
+
+
 def view_raid(request, raid_id):
     raid = Raid.objects.get(raid_id=raid_id)
     fights = Fight.objects.filter(raid=raid)
@@ -54,8 +75,10 @@ def view_raid(request, raid_id):
     players = {score_obj.player for score_obj in score_objs}
     avg_scores = _get_avg_scores(score_objs)
     sorted_scores = _sort_avg_scores(avg_scores)
+    final_totals = _get_totals(score_objs)
 
-    return render(request, "raid_view.html", {"players": players, "score_objs": score_objs, "avg_scores": sorted_scores})
+    return render(request, "raid_view.html", {"players": players, "score_objs": score_objs,
+                                              "avg_scores": sorted_scores, "final_totals": final_totals})
 
 
 def view_player_details_for_raid(request, raid_id, player_id, boss_id):
@@ -78,8 +101,7 @@ def view_player_details_for_raid(request, raid_id, player_id, boss_id):
     return render(request, "player_raid_view.html", context)
 
 
-def parse_raid(request, raid_id):
-    parse_task.apply_async((raid_id,), task_id=raid_id)
+def parse_raid(request):
     return render(request, 'parse.html', {})
 
 
@@ -93,3 +115,12 @@ def view_parse_progress(request, raid_id):
 def parse_raid_legacy(request, raid_id):
     parse_raid_task(raid_id, update_progress=False)
     return render(request, 'parse.html', {})
+
+
+def start_parse(request):
+    if request.method == 'POST':
+        print(request.POST)
+        raid_id = request.POST.get("raid_id")
+        print(raid_id)
+        return HttpResponse({}, content_type='application/json')
+        # parse_task.apply_async((raid_id,), task_id=raid_id)

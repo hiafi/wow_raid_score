@@ -36,7 +36,7 @@ class SpecInfo(object):
     SHAMAN_ENH = 263
     WARLOCK_AFF = None
     WARLOCK_DESTR = None
-    WARLOCK_DEMO = None
+    WARLOCK_DEMO = 266
     WARRIOR_PROT = None
     WARRIOR_ARMS = 72
     WARRIOR_FURY = None
@@ -123,6 +123,7 @@ class BossAnalyzer(object):
             267,  # destruction lock
             64,  # frost mage
             262,  # Ele shaman
+            SpecInfo.WARLOCK_DEMO,
         }
         healer_specs = {
             SpecInfo.DRUID_RESTO,

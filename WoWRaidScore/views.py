@@ -107,7 +107,10 @@ def parse_raid(request):
 
 def view_parse_progress(request, raid_id):
     task = AsyncResult(raid_id)
-    data = {"result": task.result, "state": task.state}
+    if task.result:
+        data = task.result
+    else:
+        data = {"process_percent": 0}
     json_data = json.dumps(data)
     return HttpResponse(json_data, content_type='application/json')
 
@@ -119,8 +122,6 @@ def parse_raid_legacy(request, raid_id):
 
 def start_parse(request):
     if request.method == 'POST':
-        print(request.POST)
         raid_id = request.POST.get("raid_id")
-        print(raid_id)
-        return HttpResponse({}, content_type='application/json')
         # parse_task.apply_async((raid_id,), task_id=raid_id)
+        return HttpResponse({}, content_type='application/json')

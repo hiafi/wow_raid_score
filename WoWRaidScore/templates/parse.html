@@ -7,13 +7,38 @@
 <input type="button" value="Start Legacy Parse" id="start_legacy_parse">
 </div>
 
+<div id="progressbar"></div>
+<div id="progress_status"></div>
+
 <script>
+    $("#progressbar").progressbar({value: 0});
+
     $("#start_parse").click(function() {
+        $("#progressbar").progressbar({value: 0});
+        var raid_id = $("#raid_id").val();
+        var status_func = setInterval(function() {
+            $.ajax({
+                url: '/parse/status/'+raid_id+'/',
+                method: "get"
+            }).done(function(json_str) {
+                percent = json_str["process_percent"];
+                $("#progressbar").progressbar({value: percent});
+                if (percent >= 100.0) {
+                    clearInterval(status_func);
+                    $("#progress_status").text("Finished");
+                }
+            });
+        }, 3000);
         $.ajax({
-            url: "http://127.0.0.1:8000/parse/start/",
+            url: '{% url "start_parse" %}',
             method: "POST",
-            data: {"raid_id": $("#raid_id").val(), csrfmiddlewaretoken: "{{ csrf_token }}"}
-        })
+            data: {"raid_id": raid_id, csrfmiddlewaretoken: "{{ csrf_token }}"}
+        });
+        $("#progress_status").text("Processing");
     });
+
+    $( function() {
+
+  } );
 </script>
 {% endblock %}

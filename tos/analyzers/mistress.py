@@ -152,7 +152,7 @@ class MistressAnalyzer(BossAnalyzer):
                                                 "ability.id": "234332"
                                             }, actors_obj_dict=self.actors):
             score_obj = self.score_objs.get(event.target)
-            score_obj.stacked_hydra_shots -= 50
+            score_obj.stacked_hydra_shots -= 25
 
     def stupid_damage(self):
         bufferfish = self._bufferfish_durations()
@@ -173,7 +173,7 @@ class MistressAnalyzer(BossAnalyzer):
 
             if valid:
                 score_obj = self.score_objs.get(event.target)
-                score_obj.tornado_damage -= 40
+                score_obj.tornado_damage -= 20
         for event in self.client.get_events(self.wcl_fight,
                                             filters={
                                                 "type": [WCLEventTypes.damage],
@@ -181,7 +181,7 @@ class MistressAnalyzer(BossAnalyzer):
                                             }, actors_obj_dict=self.actors):
             if not self.check_for_wipe(event):
                 score_obj = self.score_objs.get(event.target)
-                score_obj.hit_by_giant_fish -= 60
+                score_obj.hit_by_giant_fish -= 30
 
     def interrupts(self):
         for event in self.client.get_events(self.wcl_fight,

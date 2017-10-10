@@ -110,11 +110,14 @@ def view_player_death_count_times(request, raid_id):
     death_counts = defaultdict(int)
     first_three = []
     for index, fight in wcl_fights.items():
-        first_three_fight = [player for player in wcl_client.get_death_order(fight, actors_obj_dict={player.id: player for player in fight.players}) if player][:3]
+        first_three_fight = [player for player in
+                             wcl_client.get_death_order(fight, actors_obj_dict={player.id: player for player in fight.players})
+                             if player][:3]
         first_three.append(first_three_fight)
         for player in first_three_fight:
             death_counts[player] += 1
-    sorted_deaths = sorted([(player, death_count) for (player, death_count) in death_counts.items()], key=lambda x: x[1], reverse=True)
+    sorted_deaths = sorted([(player, death_count) for (player, death_count) in death_counts.items()],
+                           key=lambda x: x[1], reverse=True)
     context = {"death_counts": sorted_deaths, "first_three": first_three}
     return render(request, "death_order.html", context)
 
@@ -147,3 +150,7 @@ def start_parse(request):
         raid_id = request.POST.get("raid_id")
         parse_task.apply_async((raid_id,), task_id=raid_id)
         return HttpResponse({}, content_type='application/json')
+
+
+def change_log(request):
+    return render(request, 'change_log.html')

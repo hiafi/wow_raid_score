@@ -19,8 +19,9 @@ logger = logging.getLogger(__name__)
 
 # Create your views here.
 
+
 def view_raids(request):
-    raids = Raid.objects.all()
+    raids = Raid.objects.all().order_by("time")
     return render(request, "raids_view.html", {"raids": raids})
 
 
@@ -84,6 +85,18 @@ def view_raid(request, raid_id):
                                               "avg_scores": sorted_scores, "final_totals": final_totals})
 
 
+def _get_totals_for_player(score_objs):
+    totals = defaultdict(int)
+    if len(score_objs) <= 0:
+        return totals
+    for key in score_objs[0].table_keys:
+        for score_obj in score_objs:
+            totals[key] += score_obj.score_dict.get(key, 0)
+    for score_obj in score_objs:
+        totals["Total"] += score_obj.total
+    return totals
+
+
 def view_player_details_for_raid(request, raid_id, player_id, boss_id):
     player = Player.objects.get(id=player_id)
     raid = Raid.objects.get(raid_id=raid_id)
@@ -92,12 +105,7 @@ def view_player_details_for_raid(request, raid_id, player_id, boss_id):
     score_objs = RaidScore.objects.filter(player=player, fight__in=fights).order_by("fight__fight_id").select_subclasses()
     total_list = [score.total for score in score_objs]
     health_list = [score.fight.percent for score in score_objs]
-    totals = defaultdict(int)
-    for key in score_objs[0].table_keys:
-        for score_obj in score_objs:
-            totals[key] += score_obj.score_dict.get(key, 0)
-    for score_obj in score_objs:
-        totals["Total"] += score_obj.total
+    totals = _get_totals_for_player(score_objs)
 
     context = {"player": player, "score_objs": score_objs, "totals": total_list,
                "health": health_list, "total_dict": totals}

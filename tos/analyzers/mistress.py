@@ -160,7 +160,6 @@ class MistressAnalyzer(BossAnalyzer):
         for player, missed_soak_count in missed_soaks.items():
             score_obj = self.score_objs.get(player)
             score_obj.hydra_shots -= 10
-
         for player, stacked_shots in self.get_stun_times().items():
             score_obj = self.score_objs.get(player)
             score_obj.stacked_hydra_shots -= 25 * len(stacked_shots)
@@ -194,7 +193,6 @@ class MistressAnalyzer(BossAnalyzer):
 
             if not self.check_for_wipe(event):
                 score_obj = self.score_objs.get(event.target)
-                print(event.target, event.timestamp, self.get_stun_times().get(event.target, []))
                 if self.between_multiple_durations(self.get_stun_times().get(event.target, []), event.timestamp):
                     score_obj.hit_by_giant_fish -= 10
                 else:

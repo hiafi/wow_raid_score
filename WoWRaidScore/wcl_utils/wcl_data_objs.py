@@ -51,7 +51,7 @@ class WCLFight(object):
         self.enemies[enemy.id] = enemy
 
     def __str__(self):
-        return "<WCLFight {} ({}) - {} ({}%)>".format(self.name, self.boss_id, self.id, self.percent)
+        return "<WCLFight {} ({}) - {} ({}%)>".format(self.name, self.boss_id, self.attempt, self.percent)
 
     def __repr__(self):
         return self.__str__()

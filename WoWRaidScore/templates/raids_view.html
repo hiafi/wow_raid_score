@@ -1,7 +1,7 @@
 {% extends 'base_template.html' %}
 {% block content %}
     {% for raid in raids %}
-    <div><a href="/{{raid.raid_id}}/">{{ raid }}</a></div>
+    <div><a href="/{{raid.raid_id}}/">{{raid.time}} - {{ raid.raid_id }}</a></div>
     {% endfor %}
     <br />
 {% endblock %}

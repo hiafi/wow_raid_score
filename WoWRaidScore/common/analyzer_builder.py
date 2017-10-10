@@ -14,9 +14,9 @@ def _get_player_objs_dict(wcl_fights):
         for player in fight.players:
             if player.id not in players_to_get:
                 try:
-                    players_to_get[player.id] = Player.objects.get(name=player.name)
+                    players_to_get[player.id] = Player.objects.get(guid=player.guid)
                 except ObjectDoesNotExist:
-                    p_obj = Player(name=player.name, server="")
+                    p_obj = Player(name=player.name, server="", guid=player.guid)
                     p_obj.save()
                     players_to_get[player.id] = p_obj
     return players_to_get

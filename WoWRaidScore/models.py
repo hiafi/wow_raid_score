@@ -9,6 +9,7 @@ from unidecode import unidecode
 class Player(models.Model):
     name = models.CharField(max_length=20)
     server = models.CharField(max_length=30)
+    guid = models.IntegerField()
 
     class Meta:
         app_label = "WoWRaidScore"

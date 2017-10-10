@@ -69,6 +69,13 @@ class BossAnalyzer(object):
     def between_duration(start_time, end_time, time_to_check):
         return start_time <= time_to_check <= end_time
 
+    @staticmethod
+    def between_multiple_durations(durations, time_to_check):
+        for (start_time, end_time) in durations:
+            if start_time <= time_to_check <= end_time:
+                return True
+        return False
+
     def check_for_wipe(self, event, death_count=None, time_count=None, ignore_percent=20.0):
         """
         Returns if it is a wipe

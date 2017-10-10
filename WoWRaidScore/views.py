@@ -8,6 +8,7 @@ from django.http import HttpResponse
 
 from WoWRaidScore.models import Raid, Fight, RaidScore, Player, Boss
 from WoWRaidScore.tasks import parse_task, parse_raid_task
+from WoWRaidScore.wcl_utils.wclogs_requests import WCLRequests
 
 from celery.result import AsyncResult
 
@@ -101,6 +102,21 @@ def view_player_details_for_raid(request, raid_id, player_id, boss_id):
     context = {"player": player, "score_objs": score_objs, "totals": total_list,
                "health": health_list, "total_dict": totals}
     return render(request, "player_raid_view.html", context)
+
+
+def view_player_death_count_times(request, raid_id):
+    wcl_client = WCLRequests(raid_id)
+    wcl_fights = wcl_client.get_fights()
+    death_counts = defaultdict(int)
+    first_three = []
+    for index, fight in wcl_fights.items():
+        first_three_fight = [player for player in wcl_client.get_death_order(fight, actors_obj_dict={player.id: player for player in fight.players}) if player][:3]
+        first_three.append(first_three_fight)
+        for player in first_three_fight:
+            death_counts[player] += 1
+    sorted_deaths = sorted([(player, death_count) for (player, death_count) in death_counts.items()], key=lambda x: x[1], reverse=True)
+    context = {"death_counts": sorted_deaths, "first_three": first_three}
+    return render(request, "death_order.html", context)
 
 
 def parse_raid(request):

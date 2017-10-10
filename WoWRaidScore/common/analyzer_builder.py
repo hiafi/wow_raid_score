@@ -49,7 +49,6 @@ def _get_combatant_info(wcl_client, wcl_fight, actors):
 def build_analyzers(wcl_fights, raid_obj, wcl_client):
     analyzers = []
     player_objs = _get_player_objs_dict(wcl_fights)
-    print("Building fights for {}".format(raid_obj))
     for wcl_fight in wcl_fights.values():
         raid = raid_id_to_fight_dict.get(wcl_fight.zone_id)
         if not raid:

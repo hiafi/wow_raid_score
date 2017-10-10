@@ -188,3 +188,17 @@ class WCLRequests(object):
                 events = data.get("events")
             else:
                 events = []
+
+    def get_death_times(self, fight, actors_obj_dict=None):
+        deaths = {}
+        for event in self.get_events(fight,
+                                     filters={"type": WCLEventTypes.death},
+                                     actors_obj_dict=actors_obj_dict):
+            if event.target_is_friendly and event.target != "Unknown" and not isinstance(event.target, int):
+                deaths[event.target] = event.timestamp
+        return deaths
+
+    def get_death_order(self, fight, actors_obj_dict=None):
+        deaths = self.get_death_times(fight, actors_obj_dict)
+        tmp = sorted([(death_time, player) for player, death_time in deaths.items()], key=lambda x: x[0])
+        return [p[1] for p in tmp]

@@ -79,7 +79,7 @@ class WCLPlayer(WCLActor):
         self.server = ""
 
     def __str__(self):
-        return "<Player: {}>".format(self.id)
+        return "<Player: {}>".format(unidecode(self.name))
 
     def __repr__(self):
         return self.__str__()

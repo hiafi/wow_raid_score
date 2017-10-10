@@ -9,6 +9,10 @@ class MistressAnalyzer(BossAnalyzer):
     SCORE_OBJ = MistressScore
     STOP_AT_DEATH = 4
 
+    def __init__(self, wcl_fight, wcl_client, score_objs, actors):
+        super(MistressAnalyzer, self).__init__(wcl_fight, wcl_client, score_objs, actors)
+        self.stuns = defaultdict(list)
+
     def analyze(self):
         print("Processing {}".format(self.wcl_fight))
         if self.wcl_fight.difficulty >= self.HEROIC_DIFFICULTY:
@@ -112,6 +116,17 @@ class MistressAnalyzer(BossAnalyzer):
         except KeyError:
             pass
 
+    def get_stun_times(self):
+        if self.stuns:
+            return self.stuns
+        for event in self.client.get_events(self.wcl_fight,
+                                            filters={
+                                                "type": WCLEventTypes.apply_debuff,
+                                                "ability.id": "234332"
+                                            }, actors_obj_dict=self.actors):
+            self.stuns[event.target].append((event.timestamp, event.timestamp + 20000))
+        return self.stuns
+
     def hydra_shots(self):
         bufferfish_times = self._bufferfish_durations()
         deaths = self.get_player_death_times()
@@ -146,13 +161,9 @@ class MistressAnalyzer(BossAnalyzer):
             score_obj = self.score_objs.get(player)
             score_obj.hydra_shots -= 10
 
-        for event in self.client.get_events(self.wcl_fight,
-                                            filters={
-                                                "type": WCLEventTypes.apply_debuff,
-                                                "ability.id": "234332"
-                                            }, actors_obj_dict=self.actors):
-            score_obj = self.score_objs.get(event.target)
-            score_obj.stacked_hydra_shots -= 25
+        for player, stacked_shots in self.get_stun_times().items():
+            score_obj = self.score_objs.get(player)
+            score_obj.stacked_hydra_shots -= 25 * len(stacked_shots)
 
     def stupid_damage(self):
         bufferfish = self._bufferfish_durations()
@@ -173,15 +184,21 @@ class MistressAnalyzer(BossAnalyzer):
 
             if valid:
                 score_obj = self.score_objs.get(event.target)
-                score_obj.tornado_damage -= 20
+                score_obj.tornado_damage -= 30
+
         for event in self.client.get_events(self.wcl_fight,
                                             filters={
                                                 "type": [WCLEventTypes.damage],
                                                 "ability.name": "Crashing Wave"
                                             }, actors_obj_dict=self.actors):
+
             if not self.check_for_wipe(event):
                 score_obj = self.score_objs.get(event.target)
-                score_obj.hit_by_giant_fish -= 30
+                print(event.target, event.timestamp, self.get_stun_times().get(event.target, []))
+                if self.between_multiple_durations(self.get_stun_times().get(event.target, []), event.timestamp):
+                    score_obj.hit_by_giant_fish -= 10
+                else:
+                    score_obj.hit_by_giant_fish -= 40
 
     def interrupts(self):
         for event in self.client.get_events(self.wcl_fight,

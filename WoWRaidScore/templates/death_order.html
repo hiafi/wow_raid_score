@@ -1,0 +1,13 @@
+{% extends 'base_template.html' %}
+{% block content %}
+<div>
+    {% for player, death_count in death_counts %}
+        <div>{{player}} - {{death_count}}</div>
+    {% endfor %}
+    <br />
+    {% for player_group in first_three %}
+        <div>{{player_group}}</div>
+    {% endfor %}
+
+</div>
+{% endblock %}

@@ -159,7 +159,10 @@ def parse_raid_legacy(request, raid_id):
 def start_parse(request):
     if request.method == 'POST':
         raid_id = request.POST.get("raid_id")
-        group = Group.objects.get(id=request.POST.get("group"))
+        try:
+            group = Group.objects.get(id=request.POST.get("group"))
+        except Exception:
+            group = None
         parse_task.apply_async((raid_id, request.user, group), task_id=raid_id)
         return HttpResponse({}, content_type='application/json')
 

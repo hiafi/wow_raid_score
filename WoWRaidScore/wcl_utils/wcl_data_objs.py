@@ -199,6 +199,12 @@ class WCLDamageEvent(WCLAbilityEventObj):
         self.point_y = data.get("y")
         self.hit_type = data.get("hitType")
         self.damage_total = data.get("amount") + data.get("absorbed")
+        self.hp_remaining = data.get("hitPoints")
+        self.hp_max = data.get("maxHitPoints")
+
+    @property
+    def hp_percent(self):
+        return float(self.hp_remaining) / self.hp_max
 
     @property
     def location(self):

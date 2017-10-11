@@ -23,6 +23,7 @@ class MistressAnalyzer(BossAnalyzer):
             self.shadow_dropoffs()
         self.stupid_damage()
         self.hydra_shots()
+        self.tornado_damage()
         self.interrupts()
         self.dispels()
 
@@ -133,6 +134,8 @@ class MistressAnalyzer(BossAnalyzer):
         recent_timestamp = 0
         players_to_check = set()
         missed_soaks = defaultdict(int)
+        cached_health = False
+        player_status = {}
         for event in self.client.get_events(self.wcl_fight,
                                             filters={
                                                 "type": [WCLEventTypes.apply_debuff],
@@ -141,6 +144,10 @@ class MistressAnalyzer(BossAnalyzer):
             if event.timestamp - recent_timestamp > 3000:
                 for player in players_to_check:
                     missed_soaks[player] += 1
+                    cached_health = False
+                if not cached_health:
+                    cached_health = True
+                    player_status = self.get_all_player_status_at_time(event.timestamp)
                 recent_timestamp = event.timestamp
                 players_to_check = set([p for p in self.score_objs.keys()])
 
@@ -148,6 +155,9 @@ class MistressAnalyzer(BossAnalyzer):
                     if score_obj.tank:
                         self.remove_from_set(p, players_to_check)
                     elif deaths.get(p) is not None and deaths.get(p, 0) <= recent_timestamp:
+                        self.remove_from_set(p, players_to_check)
+                    status = player_status.get(p)
+                    if status and status.player_hp < 2000000:
                         self.remove_from_set(p, players_to_check)
 
                 for player, bufferfish_time in bufferfish_times.items():
@@ -157,6 +167,7 @@ class MistressAnalyzer(BossAnalyzer):
                         if start_time <= recent_timestamp <= end_time:
                             self.remove_from_set(player, players_to_check)
             self.remove_from_set(event.target, players_to_check)
+
         for player, missed_soak_count in missed_soaks.items():
             score_obj = self.score_objs.get(player)
             score_obj.hydra_shots -= 10
@@ -164,8 +175,10 @@ class MistressAnalyzer(BossAnalyzer):
             score_obj = self.score_objs.get(player)
             score_obj.stacked_hydra_shots -= 25 * len(stacked_shots)
 
-    def stupid_damage(self):
+    def tornado_damage(self):
         bufferfish = self._bufferfish_durations()
+        times_people_were_hit = defaultdict(list)
+        number_of_people_hit_at_times = defaultdict(int)
         for event in self.client.get_events(self.wcl_fight,
                                             filters={
                                                 "type": [WCLEventTypes.apply_debuff],
@@ -182,9 +195,24 @@ class MistressAnalyzer(BossAnalyzer):
                 valid = False
 
             if valid:
-                score_obj = self.score_objs.get(event.target)
-                score_obj.tornado_damage -= 30
+                times_people_were_hit[event.target].append(event.timestamp)
+        for player, timestamps in times_people_were_hit.items():
+            for timestamp in timestamps:
+                found = False
+                for existing_timestamp in number_of_people_hit_at_times.keys():
+                    if abs(timestamp - existing_timestamp) < 10000:
+                        found = True
+                        number_of_people_hit_at_times[existing_timestamp] += 1
+                if not found:
+                    number_of_people_hit_at_times[timestamp] = 1
+        existing_timestamps = [(timestamp - 10000, timestamp + 10000) for timestamp, number_hit in number_of_people_hit_at_times.items() if number_hit > 5]
+        for player, timestamps in times_people_were_hit.items():
+            for timestamp in timestamps:
+                if not self.between_multiple_durations(existing_timestamps, timestamp):
+                    score_obj = self.score_objs.get(player)
+                    score_obj.tornado_damage -= 30
 
+    def stupid_damage(self):
         for event in self.client.get_events(self.wcl_fight,
                                             filters={
                                                 "type": [WCLEventTypes.damage],

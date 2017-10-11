@@ -4,6 +4,27 @@ from WoWRaidScore.wcl_utils.wcl_data_objs import WCLEventTypes
 import math
 
 
+class PlayerStatus(object):
+    def __init__(self, damage_event):
+        self.player_hp = damage_event.hp_remaining
+        self.max_hp = damage_event.hp_max
+        self.point_x = damage_event.point_x
+        self.point_y = damage_event.point_y
+
+    @property
+    def location(self):
+        return (self.point_x, self.point_y)
+
+    @property
+    def hp_percent(self):
+        return float(self.player_hp) / self.max_hp
+
+    def __str__(self):
+        return "<PlayerStatus - {} / {} {}".format(self.player_hp, self.max_hp, self.location)
+
+    def __repr__(self):
+        return self.__str__()
+
 class SpecInfo(object):
     DH_VENG = None
     DH_HAVOC = None
@@ -184,6 +205,34 @@ class BossAnalyzer(object):
         if len(death_order) > number_of_deaths:
             death_time = self.get_player_death_times().get(death_order[number_of_deaths])
         return death_time
+
+    def get_actor_id(self, actor):
+        for id, actor_obj in self.actors.items():
+            if actor == actor_obj:
+                return id
+        return None
+
+    def get_player_status_at_time(self, player, timestamp):
+        for advancing_rollback in (2000, 6000, 30000):
+            for event in self.client.get_events(self.wcl_fight,
+                                                start_time=timestamp-advancing_rollback,
+                                                end_time=timestamp,
+                                                filters={"type": WCLEventTypes.damage, "target.name": player.name},
+                                                actors_obj_dict=self.actors):
+                if event.hp_remaining and event.point_x:
+                    return PlayerStatus(event)
+        return None
+
+    def get_all_player_status_at_time(self, timestamp):
+        status = {}
+        for event in self.client.get_events(self.wcl_fight,
+                                            start_time=timestamp-10000,
+                                            end_time=timestamp,
+                                            filters={"type": WCLEventTypes.damage, "target.disposition": "friendly"},
+                                            actors_obj_dict=self.actors):
+            if event.hp_remaining and event.point_x and not isinstance(event.target, int) and event.target_is_friendly:
+                status[event.target] = PlayerStatus(event)
+        return status
 
     def analyze(self):
         raise NotImplementedError()

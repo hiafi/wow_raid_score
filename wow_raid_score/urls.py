@@ -15,8 +15,11 @@ Including another URLconf
 """
 from django.conf.urls import url, include
 from django.contrib import admin
+from django.contrib.auth import views as admin_views
 
 urlpatterns = [
+    url(r'^login/$', admin_views.login, name="login"),
+    url(r'^logout/$', admin_views.logout, name="logout"),
     url(r'^admin/', admin.site.urls),
     url(r'^', include('WoWRaidScore.urls')),
 ]

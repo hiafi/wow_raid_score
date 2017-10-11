@@ -7,7 +7,7 @@ from collections import defaultdict
 
 class MistressAnalyzer(BossAnalyzer):
     SCORE_OBJ = MistressScore
-    STOP_AT_DEATH = 4
+    STOP_AT_DEATH = 5
 
     def __init__(self, wcl_fight, wcl_client, score_objs, actors):
         super(MistressAnalyzer, self).__init__(wcl_fight, wcl_client, score_objs, actors)

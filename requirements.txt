@@ -1,3 +1,4 @@
+Django
 Unidecode
 requests
 django-model-utils

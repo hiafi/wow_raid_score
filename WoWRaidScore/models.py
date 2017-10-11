@@ -4,6 +4,7 @@ from __future__ import unicode_literals
 from django.db import models
 from model_utils.managers import InheritanceManager
 from unidecode import unidecode
+from django.contrib.auth.models import User
 
 
 class Player(models.Model):
@@ -34,9 +35,17 @@ class Boss(models.Model):
         return self.__str__()
 
 
+class Group(models.Model):
+    name = models.CharField(max_length=30)
+    short_name = models.SlugField(max_length=10)
+    user_access = models.ManyToManyField(User)
+
+
 class Raid(models.Model):
     raid_id = models.CharField(max_length=30)
     time = models.DateTimeField()
+    user = models.ForeignKey(User)
+    group = models.ForeignKey(Group, null=True, blank=True)
 
     def __str__(self):
         return "<Raid {} - {}>".format(self.raid_id, self.time)

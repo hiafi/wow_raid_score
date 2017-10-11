@@ -176,15 +176,19 @@ class WCLRequests(object):
         )
         return self._get_json_data_from_wcl(url)
 
-    def get_events(self, fight, actor_id=None, filters=None, actors_obj_dict=None):
-        r_json = self._get_event_json(fight.start_time_str, fight.end_time_str, actor_id, filters)
+    def get_events(self, fight, actor_id=None, filters=None, actors_obj_dict=None, start_time=None, end_time=None):
+        if start_time is None:
+            start_time = fight.start_time_str
+        if end_time is None:
+            end_time = fight.end_time_str
+        r_json = self._get_event_json(start_time, end_time, actor_id, filters)
         events = r_json.get("events")
         while events:
             for event in events:
                 yield self._create_event_obj(event, actors_obj_dict=actors_obj_dict)
             next_timestamp = r_json.get("nextPageTimestamp")
             if next_timestamp:
-                data = self._get_event_json(next_timestamp, fight.end_time_str, actor_id, filters)
+                data = self._get_event_json(next_timestamp, end_time, actor_id, filters)
                 events = data.get("events")
             else:
                 events = []

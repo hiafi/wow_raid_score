@@ -1,27 +1,29 @@
 # -*- coding: utf-8 -*-
 from __future__ import unicode_literals
 
+from celery.result import AsyncResult
 from collections import defaultdict
 
-from django.shortcuts import render
+from django.contrib.auth.decorators import login_required
+from django.contrib.auth.models import User
 from django.http import HttpResponse
-
-from WoWRaidScore.models import Raid, Fight, RaidScore, Player, Boss
-from WoWRaidScore.tasks import parse_task, parse_raid_task
-from WoWRaidScore.wcl_utils.wclogs_requests import WCLRequests
-
-from celery.result import AsyncResult
+from django.shortcuts import render
 
 import json
 import logging
+
+from WoWRaidScore.models import Raid, Fight, RaidScore, Player, Boss, Group
+from WoWRaidScore.tasks import parse_task, parse_raid_task
+from WoWRaidScore.wcl_utils.wclogs_requests import WCLRequests
 
 logger = logging.getLogger(__name__)
 
 # Create your views here.
 
 
-def view_raids(request):
-    raids = Raid.objects.all().order_by("time")
+def view_raids(request, player_id):
+    player = User.objects.get(id=player_id)
+    raids = Raid.objects.filter(user=player).order_by("time")
     return render(request, "raids_view.html", {"raids": raids})
 
 
@@ -129,7 +131,7 @@ def view_player_death_count_times(request, raid_id):
     context = {"death_counts": sorted_deaths, "first_three": first_three}
     return render(request, "death_order.html", context)
 
-
+@login_required
 def parse_raid(request):
     return render(request, 'parse.html', {})
 
@@ -147,16 +149,18 @@ def view_parse_progress(request, raid_id):
     json_data = json.dumps(data)
     return HttpResponse(json_data, content_type='application/json')
 
-
+@login_required
 def parse_raid_legacy(request, raid_id):
-    parse_raid_task(raid_id, update_progress=False)
+    group = None
+    parse_raid_task(raid_id, request.user, group, overwrite=True, update_progress=False)
     return render(request, 'parse.html', {})
 
-
+@login_required
 def start_parse(request):
     if request.method == 'POST':
         raid_id = request.POST.get("raid_id")
-        parse_task.apply_async((raid_id,), task_id=raid_id)
+        group = Group.objects.get(id=request.POST.get("group"))
+        parse_task.apply_async((raid_id, request.user, group), task_id=raid_id)
         return HttpResponse({}, content_type='application/json')
 
 

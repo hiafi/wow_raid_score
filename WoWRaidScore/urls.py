@@ -3,7 +3,7 @@ from django.conf.urls import url
 from . import views
 
 urlpatterns = [
-    url(r'^changelog\/$', views.change_log),
+    url(r'^changelog\/$', views.change_log, name="change_log"),
     url(r'^parse\/status\/(?P<raid_id>\w+)\/$', views.view_parse_progress, name="parse_progress"),
     url(r'^parse\/start\/$', views.start_parse, name="start_parse"),
     url(r'^parse\/$', views.parse_raid),

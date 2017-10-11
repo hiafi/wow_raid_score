@@ -4,4 +4,6 @@
     <div><a href="/{{raid.raid_id}}/">{{raid.time}} - {{ raid.raid_id }}</a></div>
     {% endfor %}
     <br />
+    <div><a href='{% url "change_log" %}'> Change log</a></div>
+    <div><a href='https://goo.gl/forms/OsPA0mfOQS198bWo2'>Feature request / Bug report</a></div>
 {% endblock %}

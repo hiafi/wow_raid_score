@@ -114,7 +114,7 @@ class MistressAnalyzer(BossAnalyzer):
                 start_time = debuff_dict.get(event.target)
                 duration = event.timestamp - start_time
                 if duration < 5900:
-                    dropoffs[event.target] += 2
+                    dropoffs[event.target] += 1
                     if end_at is None:
                         end_at = event.timestamp + 150 * 1000
                 else:

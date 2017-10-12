@@ -152,7 +152,7 @@ def view_parse_progress(request, raid_id):
 @login_required
 def parse_raid_legacy(request, raid_id):
     group = None
-    parse_raid_task(raid_id, request.user, group, overwrite=True, update_progress=False)
+    parse_raid_task(raid_id, request.user.id, group, overwrite=True, update_progress=False)
     return render(request, 'parse.html', {})
 
 @login_required
@@ -163,7 +163,7 @@ def start_parse(request):
             group = Group.objects.get(id=request.POST.get("group"))
         except Exception:
             group = None
-        parse_task.apply_async((raid_id, request.user, group), task_id=raid_id)
+        parse_task.apply_async((raid_id, request.user.id, group), task_id=raid_id)
         return HttpResponse({}, content_type='application/json')
 
 

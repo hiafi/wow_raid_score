@@ -1,9 +1,10 @@
 from celery import shared_task, current_task
 from WoWRaidScore.wcl_utils.wclogs_requests import WCLRequests
 from django.core.exceptions import ObjectDoesNotExist
+from django.contrib.auth.models import User
 
 from WoWRaidScore.common.analyzer_builder import build_analyzers
-from WoWRaidScore.models import Raid, Fight, RaidScore
+from WoWRaidScore.models import Raid, Fight, RaidScore, Group
 
 @shared_task
 def add(x, y):
@@ -34,7 +35,12 @@ def get_progress(current_analyzer, num_analyzers):
     return int(float(current_analyzer) / num_analyzers * 90.0)
 
 
-def parse_raid_task(raid_id, user, group, overwrite=True, update_progress=True):
+def parse_raid_task(raid_id, user_id, group_id=None, overwrite=True, update_progress=True):
+    user = User.objects.get(id=user_id)
+    if group_id:
+        group = Group.objects.get(id=group_id)
+    else:
+        group = None
     wcl_client = WCLRequests(raid_id)
     update_status(0.0, update_progress)
     try:

@@ -84,7 +84,7 @@ def view_raid(request, raid_id):
     final_totals = _get_totals(score_objs)
 
     return render(request, "raid_view.html", {"players": players, "score_objs": score_objs,
-                                              "avg_scores": sorted_scores, "final_totals": final_totals})
+                                              "avg_scores": sorted_scores, "final_totals": final_totals, "raid": raid})
 
 
 def _get_totals_for_player(score_objs):
@@ -138,8 +138,6 @@ def parse_raid(request):
 
 def view_parse_progress(request, raid_id):
     task = AsyncResult(raid_id)
-    logger.info(task.result)
-    logger.info(task.status)
     if task.result:
         data = task.result
     elif task.successful():
@@ -165,8 +163,8 @@ def start_parse(request):
             group = request.POST.get("group")
         except Exception:
             group = None
-        parse_task.apply_async((raid_id, request.user.id, group), task_id=raid_id)
-        return HttpResponse({}, content_type='application/json')
+        parse_task.apply_async(kwargs={"raid_id": raid_id, "user": request.user.id, "group": group}, task_id=raid_id)
+        return HttpResponse({"test": request.user.id}, content_type='application/json')
 
 
 def change_log(request):

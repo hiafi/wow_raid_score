@@ -9,7 +9,7 @@
         {% for row in avg_scores|slice:"1:" %}
         <tr>
             {% for col in row %}
-                <td><a href="{{col.1.id}}/{{col.2.boss_id}}/">{{col.1.safe_name}} {{col.0|floatformat}}</a></td>
+                <td><a href='{% url "view_raid_player_details" raid_id=raid.raid_id player_id=col.1.id boss_id=col.2.boss_id %}'>{{col.1.safe_name}} {{col.0|floatformat}}</a></td>
             {% endfor %}
         </tr>
         {% endfor %}

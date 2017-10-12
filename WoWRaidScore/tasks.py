@@ -66,6 +66,3 @@ def parse_raid_task(raid_id, user_id, group_id, overwrite=True, update_progress=
         analyzer.analyze()
         progress = 10.0 + get_progress(index, num_analyzers)
         update_status(progress, update_progress)
-
-
-

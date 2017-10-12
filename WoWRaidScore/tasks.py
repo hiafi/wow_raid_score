@@ -35,7 +35,7 @@ def get_progress(current_analyzer, num_analyzers):
     return int(float(current_analyzer) / num_analyzers * 90.0)
 
 
-def parse_raid_task(raid_id, user_id, group_id=None, overwrite=True, update_progress=True):
+def parse_raid_task(raid_id, user_id, group_id, overwrite=True, update_progress=True):
     user = User.objects.get(id=user_id)
     if group_id:
         group = Group.objects.get(id=group_id)

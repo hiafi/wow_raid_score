@@ -12,7 +12,7 @@ from django.shortcuts import render
 import json
 import logging
 
-from WoWRaidScore.models import Raid, Fight, RaidScore, Player, Boss, Group
+from WoWRaidScore.models import Raid, Fight, RaidScore, Player, Boss
 from WoWRaidScore.tasks import parse_task, parse_raid_task
 from WoWRaidScore.wcl_utils.wclogs_requests import WCLRequests
 
@@ -149,11 +149,13 @@ def view_parse_progress(request, raid_id):
     json_data = json.dumps(data)
     return HttpResponse(json_data, content_type='application/json')
 
+
 @login_required
 def parse_raid_legacy(request, raid_id):
     group = None
     parse_raid_task(raid_id, request.user.id, group, overwrite=True, update_progress=False)
     return render(request, 'parse.html', {})
+
 
 @login_required
 def start_parse(request):

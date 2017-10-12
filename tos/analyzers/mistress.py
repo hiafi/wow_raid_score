@@ -21,7 +21,7 @@ class MistressAnalyzer(BossAnalyzer):
         if self.wcl_fight.difficulty >= self.MYTHIC_DIFFICULTY:
             self.debug_message("Bufferfish")
             self.bufferfish_uptime()
-        if 40.0 < self.wcl_fight.percent <= 70.0:
+        if self.wcl_fight.percent <= 70.0:
             self.debug_message("Shadows")
             self.shadow_dropoffs()
         self.debug_message("Stupid Damage")
@@ -98,19 +98,25 @@ class MistressAnalyzer(BossAnalyzer):
         debuff_dict = {}
         dropoffs = defaultdict(int)
         failed_drops = defaultdict(int)
-
+        end_at = None
         for event in self.client.get_events(self.wcl_fight,
                                             filters={
                                                 "type": [WCLEventTypes.apply_debuff, WCLEventTypes.remove_debuff],
                                                 "ability.id": "232913"
                                             }, actors_obj_dict=self.actors):
+
+            if end_at and event.timestamp > end_at:
+                break
             if event.type == WCLEventTypes.apply_debuff:
                 debuff_dict[event.target] = event.timestamp
             else:
+
                 start_time = debuff_dict.get(event.target)
                 duration = event.timestamp - start_time
                 if duration < 5900:
-                    dropoffs[event.target] += 1
+                    dropoffs[event.target] += 2
+                    if end_at is None:
+                        end_at = event.timestamp + 150 * 1000
                 else:
                     failed_drops[event.target] += 1
 
@@ -177,7 +183,7 @@ class MistressAnalyzer(BossAnalyzer):
 
         for player, missed_soak_count in missed_soaks.items():
             score_obj = self.score_objs.get(player)
-            score_obj.hydra_shots -= 10
+            score_obj.hydra_shots -= 10 * missed_soak_count
         for player, stacked_shots in self.get_stun_times().items():
             score_obj = self.score_objs.get(player)
             score_obj.stacked_hydra_shots -= 25 * len(stacked_shots)

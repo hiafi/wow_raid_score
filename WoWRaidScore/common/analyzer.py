@@ -64,12 +64,17 @@ class SpecInfo(object):
 
 
 class BossAnalyzer(object):
+    DEBUG = True
     SCORE_OBJ = RaidScore
     STOP_AT_DEATH = 7
 
     NORMAL_DIFFICULTY = 1
     HEROIC_DIFFICULTY = 2
     MYTHIC_DIFFICULTY = 5
+
+    def debug_message(self, message):
+        if self.DEBUG:
+            print(message)
 
     def __init__(self, wcl_fight, wcl_client, score_objs, actors):
         self.wcl_fight = wcl_fight

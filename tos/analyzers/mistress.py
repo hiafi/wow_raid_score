@@ -16,14 +16,21 @@ class MistressAnalyzer(BossAnalyzer):
     def analyze(self):
         print("Processing {}".format(self.wcl_fight))
         if self.wcl_fight.difficulty >= self.HEROIC_DIFFICULTY:
+            self.debug_message("Murloc Debuffs")
             self.murloc_debuff_uptime()
         if self.wcl_fight.difficulty >= self.MYTHIC_DIFFICULTY:
+            self.debug_message("Bufferfish")
             self.bufferfish_uptime()
         if self.wcl_fight.percent <= 70.0:
+            self.debug_message("Shadows")
             self.shadow_dropoffs()
+        self.debug_message("Stupid Damage")
         self.stupid_damage()
+        self.debug_message("Hydra Shots")
         self.hydra_shots()
+        self.debug_message("Tornados")
         self.tornado_damage()
+        self.debug_message("Interrupts / Dispels")
         self.interrupts()
         self.dispels()
 

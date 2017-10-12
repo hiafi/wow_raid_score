@@ -21,7 +21,7 @@ class MistressAnalyzer(BossAnalyzer):
         if self.wcl_fight.difficulty >= self.MYTHIC_DIFFICULTY:
             self.debug_message("Bufferfish")
             self.bufferfish_uptime()
-        if self.wcl_fight.percent <= 70.0:
+        if 40.0 < self.wcl_fight.percent <= 70.0:
             self.debug_message("Shadows")
             self.shadow_dropoffs()
         self.debug_message("Stupid Damage")
@@ -102,7 +102,7 @@ class MistressAnalyzer(BossAnalyzer):
         for event in self.client.get_events(self.wcl_fight,
                                             filters={
                                                 "type": [WCLEventTypes.apply_debuff, WCLEventTypes.remove_debuff],
-                                                "ability.name": "Befouling Ink"
+                                                "ability.id": "232913"
                                             }, actors_obj_dict=self.actors):
             if event.type == WCLEventTypes.apply_debuff:
                 debuff_dict[event.target] = event.timestamp

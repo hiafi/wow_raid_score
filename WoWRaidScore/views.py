@@ -160,7 +160,7 @@ def start_parse(request):
     if request.method == 'POST':
         raid_id = request.POST.get("raid_id")
         try:
-            group = Group.objects.get(id=request.POST.get("group"))
+            group = request.POST.get("group")
         except Exception:
             group = None
         parse_task.apply_async((raid_id, request.user.id, group), task_id=raid_id)

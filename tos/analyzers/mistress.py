@@ -177,7 +177,7 @@ class MistressAnalyzer(BossAnalyzer):
                     for start_time, end_time in bufferfish_time:
                         if end_time is None:
                             end_time = recent_timestamp + 1000
-                        if start_time <= recent_timestamp <= end_time:
+                        if start_time - 6000 <= recent_timestamp <= end_time:
                             self.remove_from_set(player, players_to_check)
             self.remove_from_set(event.target, players_to_check)
 

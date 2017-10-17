@@ -57,13 +57,11 @@ def _get_totals(score_objs):
     totals = defaultdict(lambda: defaultdict(int))
     keys_dict = {}
     final_totals = defaultdict(list)
-    print(len(score_objs))
     for score_obj in score_objs:
         for name, val in score_obj.score_dict.items():
             if score_obj.fight.boss not in keys_dict:
                 keys_dict[score_obj.fight.boss] = score_obj.table_keys
             totals[score_obj.fight.boss][name] += val
-    print(totals)
     for boss, fight_scores_dict in totals.items():
         keys = keys_dict.get(boss)
         final_totals[boss].append(keys)
@@ -151,7 +149,9 @@ def view_parse_progress(request, raid_id):
 @login_required
 def parse_raid_legacy(request, raid_id):
     group = None
+    print("Starting parsing ", raid_id)
     parse_raid_task(raid_id, request.user.id, group, overwrite=True, update_progress=False)
+    print("Finished.")
     return render(request, 'parse.html', {})
 
 

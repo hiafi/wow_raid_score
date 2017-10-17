@@ -1,4 +1,5 @@
 {% extends 'base_template.html' %}
+{% block title %}Main Page{% endblock %}
 {% block content %}
     {% for raid in raids %}
     <div><a href='{% url "view_raid" raid_id=raid.raid_id %}'>{{raid.time}} - {{ raid.raid_id }}</a></div>

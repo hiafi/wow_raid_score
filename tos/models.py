@@ -64,11 +64,13 @@ class MaidenScore(RaidScore):
     @property
     def table_keys(self):
         return [
-            "Wrong side"
+            "Wrong side", "Wrong orb", "Bomb explosions"
         ]
 
     @property
     def score_dict(self):
         return {
             "Wrong side": self.wrong_color,
+            "Wrong orb": self.wrong_orb,
+            "Bomb explosions": self.didnt_jump_in_hole,
         }

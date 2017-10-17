@@ -25,6 +25,7 @@ class PlayerStatus(object):
     def __repr__(self):
         return self.__str__()
 
+
 class SpecInfo(object):
     DH_VENG = None
     DH_HAVOC = None
@@ -35,8 +36,8 @@ class SpecInfo(object):
     DRUID_BALANCE = 102
     DRUID_FERAL = None
     DRUID_RESTO = 105
-    HUNTER_BM = None
-    HUNTER_MM = None
+    HUNTER_BM = 253
+    HUNTER_MM = 254
     HUNTER_SV = None
     MAGE_ARCANE = None
     MAGE_FIRE = None
@@ -151,7 +152,8 @@ class BossAnalyzer(object):
         ranged_dps_specs = {
             258,  #
             102,  # balance druid
-            254,  #
+            SpecInfo.HUNTER_BM,
+            SpecInfo.HUNTER_MM,
             265,  # affliction lock
             267,  # destruction lock
             64,  # frost mage
@@ -217,8 +219,12 @@ class BossAnalyzer(object):
                 return id
         return None
 
-    def get_player_status_at_time(self, player, timestamp):
-        for advancing_rollback in (2000, 6000, 30000):
+    def get_player_status_at_time(self, player, timestamp, time_to_look_back=None):
+        if time_to_look_back is None:
+            time_to_look_back = (2000, 6000, 30000)
+        if isinstance(time_to_look_back, int):
+            time_to_look_back = (time_to_look_back,)
+        for advancing_rollback in time_to_look_back:
             for event in self.client.get_events(self.wcl_fight,
                                                 start_time=timestamp-advancing_rollback,
                                                 end_time=timestamp,
@@ -228,15 +234,20 @@ class BossAnalyzer(object):
                     return PlayerStatus(event)
         return None
 
-    def get_all_player_status_at_time(self, timestamp):
+    def get_all_player_status_at_time(self, timestamp, time_to_look_back=None):
         status = {}
-        for event in self.client.get_events(self.wcl_fight,
-                                            start_time=timestamp-10000,
-                                            end_time=timestamp,
-                                            filters={"type": WCLEventTypes.damage, "target.disposition": "friendly"},
-                                            actors_obj_dict=self.actors):
-            if event.hp_remaining and event.point_x and not isinstance(event.target, int) and event.target_is_friendly:
-                status[event.target] = PlayerStatus(event)
+        if time_to_look_back is None:
+            time_to_look_back = (2000, 6000, 30000)
+        if isinstance(time_to_look_back, int):
+            time_to_look_back = (time_to_look_back,)
+        for advancing_rollback in time_to_look_back:
+            for event in self.client.get_events(self.wcl_fight,
+                                                start_time=timestamp-advancing_rollback,
+                                                end_time=timestamp,
+                                                filters={"type": WCLEventTypes.damage, "target.disposition": "friendly"},
+                                                actors_obj_dict=self.actors):
+                if event.hp_remaining and event.point_x and not isinstance(event.target, int) and event.target_is_friendly:
+                    status[event.target] = PlayerStatus(event)
         return status
 
     def analyze(self):

@@ -122,6 +122,7 @@ class WCLTargetEvent(object):
     def __init__(self, data, actor_objs_dict=None):
         self.type = data.get("type")
         self.name = data.get("ability", {}).get("name")
+        self.id = data.get("ability", {}).get("guid")
         self.timestamp = data.get("timestamp")
         self.source = data.get("sourceID")
         self.target = data.get("targetID")

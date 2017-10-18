@@ -221,7 +221,7 @@ class BossAnalyzer(object):
 
     def get_player_status_at_time(self, player, timestamp, time_to_look_back=None):
         if time_to_look_back is None:
-            time_to_look_back = (2000, 6000, 30000)
+            time_to_look_back = (2000, 6000)
         if isinstance(time_to_look_back, int):
             time_to_look_back = (time_to_look_back,)
         for advancing_rollback in time_to_look_back:
@@ -237,7 +237,7 @@ class BossAnalyzer(object):
     def get_all_player_status_at_time(self, timestamp, time_to_look_back=None):
         status = {}
         if time_to_look_back is None:
-            time_to_look_back = (2000, 6000, 30000)
+            time_to_look_back = (2000, 6000)
         if isinstance(time_to_look_back, int):
             time_to_look_back = (time_to_look_back,)
         for advancing_rollback in time_to_look_back:

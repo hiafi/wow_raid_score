@@ -5,7 +5,7 @@
 <span>Enter your raid ID here from warcraft logs: </span>
 <input label="raid_id" type="text" name="raid_id" id="raid_id">
 <input type="button" value="Start Parse" id="start_parse">
-<input type="button" value="Start Legacy Parse" id="start_legacy_parse">
+<input type="button" value="Start Live Parsing" id="start_live">
 </div>
 
 <div id="progressbar"></div>
@@ -38,8 +38,17 @@
         $("#progress_status").text("Processing");
     });
 
-    $( function() {
+    $("#start_live").click(function() {
+        var raid_id = $("#raid_id").val();
+        var repeat_parse_func = setInterval(function() {
+            $.ajax({
+                url: '{% url "live_parse" %}',
+                method: "POST",
+                data: {"raid_id": raid_id, csrfmiddlewaretoken: "{{ csrf_token }}"}
+            });
+        }, 120000);
+        $("#progress_status").text("Running Live...");
+    });
 
-  } );
 </script>
 {% endblock %}

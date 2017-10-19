@@ -68,6 +68,26 @@ class SistersScore(RaidScore):
         }
 
 
+class HostScore(RaidScore):
+    dissonance = models.IntegerField(default=0)
+    break_armors = models.IntegerField(default=0)
+    soulbinds = models.IntegerField(default=0)
+    rupturing_slam = models.IntegerField(default=0)
+    tormented_cries = models.IntegerField(default=0)
+
+    @property
+    def table_keys(self):
+        return [
+            "Dissonance", "Breaking Armors"
+        ]
+
+    @property
+    def score_dict(self):
+        return {
+            "Soaking slams": self.soaking_slams,
+            "Debuff stacks": self.stacks_of_debuff,
+        }
+
 class MistressScore(RaidScore):
     bufferfish_uptime = models.IntegerField(default=0)
     dropoffs = models.IntegerField(default=0)

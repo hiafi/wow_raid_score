@@ -6,24 +6,15 @@ from django.contrib.auth.models import User
 from WoWRaidScore.common.analyzer_builder import build_analyzers
 from WoWRaidScore.models import Raid, Fight, RaidScore, Group
 
-@shared_task
-def add(x, y):
-    return x + y
-
-
-@shared_task
-def mul(x, y):
-    return x * y
-
-
-@shared_task
-def xsum(numbers):
-    return sum(numbers)
-
 
 @shared_task()
 def parse_task(raid_id, user, group):
     parse_raid_task(raid_id, user, group)
+
+
+@shared_task()
+def update_raid_task(raid_id, user, group):
+    update_raid_to_current(raid_id, user, group)
 
 
 def update_status(progress, update_progress=True):
@@ -31,8 +22,8 @@ def update_status(progress, update_progress=True):
         current_task.update_state(state='PROGRESS', meta={'process_percent': progress})
 
 
-def get_progress(current_analyzer, num_analyzers):
-    return int(float(current_analyzer) / num_analyzers * 90.0)
+def get_progress(current_analyzer, num_analyzers, percentage_start):
+    return int(float(current_analyzer) / num_analyzers * percentage_start)
 
 
 def parse_raid_task(raid_id, user_id, group_id, overwrite=True, update_progress=True):
@@ -64,5 +55,26 @@ def parse_raid_task(raid_id, user_id, group_id, overwrite=True, update_progress=
     num_analyzers = len(analyzers)
     for index, analyzer in enumerate(analyzers):
         analyzer.analyze()
-        progress = 10.0 + get_progress(index, num_analyzers)
+        progress = 10.0 + get_progress(index, num_analyzers, 90.0)
         update_status(progress, update_progress)
+
+
+def update_raid_to_current(raid_id, user_id, group_id, update_progress=True):
+    update_status(0, update_progress)
+    try:
+        raid = Raid.objects.get(raid_id=raid_id)
+    except ObjectDoesNotExist:
+        raise Exception("Raid has not been created")
+    wcl_client = WCLRequests(raid_id)
+    wcl_fights = {f.id: f for f in wcl_client.get_fights().values()}
+    to_process = set(wcl_fights.values())
+    for fight_obj in Fight.objects.filter(raid=raid):
+        to_process.remove(wcl_fights.get(fight_obj.fight_id))
+
+    analyzers = build_analyzers({f.id: f for f in to_process}, raid, wcl_client)
+    num_analyzers = len(analyzers)
+    for index, analyzer in enumerate(analyzers):
+        analyzer.analyze()
+        progress = get_progress(index, num_analyzers, 100.0)
+        update_status(progress, update_progress)
+

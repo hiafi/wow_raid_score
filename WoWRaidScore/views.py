@@ -13,7 +13,7 @@ import json
 import logging
 
 from WoWRaidScore.models import Raid, Fight, RaidScore, Player, Boss
-from WoWRaidScore.tasks import parse_task, parse_raid_task
+from WoWRaidScore.tasks import parse_task, parse_raid_task, update_raid_to_current, update_raid_task
 from WoWRaidScore.wcl_utils.wclogs_requests import WCLRequests
 
 logger = logging.getLogger(__name__)
@@ -156,6 +156,15 @@ def parse_raid_legacy(request, raid_id):
 
 
 @login_required
+def update_raid_legacy(request, raid_id):
+    group = None
+    print("Starting to update ", raid_id)
+    update_raid_to_current(raid_id, request.user.id, group)
+    print("Finished.")
+    return render(request, 'parse.html', {})
+
+
+@login_required
 def start_parse(request):
     if request.method == 'POST':
         raid_id = request.POST.get("raid_id")
@@ -164,6 +173,19 @@ def start_parse(request):
         except Exception:
             group = None
         parse_task.apply_async(kwargs={"raid_id": raid_id, "user": request.user.id, "group": group}, task_id=raid_id)
+        return HttpResponse({"test": request.user.id}, content_type='application/json')
+
+@login_required
+def live_parse(request):
+    if request.method == 'POST':
+        raid_id = request.POST.get("raid_id")
+        try:
+            group = request.POST.get("group")
+        except Exception:
+            group = None
+        task = AsyncResult(raid_id)
+        if task is None or task.ready():
+            update_raid_task.apply_async(kwargs={"raid_id": raid_id, "user": request.user.id, "group": group}, task_id=raid_id)
         return HttpResponse({"test": request.user.id}, content_type='application/json')
 
 

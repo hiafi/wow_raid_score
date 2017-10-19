@@ -15,17 +15,22 @@
         </tr>
         {% endfor %}
     </table>
+    <br />
 
     {% for boss, score_list in final_totals.items %}
-    <table class="score_table">
-        {% for row in score_list %}
-        <tr>
-            {% for val in row %}
-            <td> {{ val }} </td>
+    <div >
+        <div style="text-align: center;"><b>{{boss}}</b></div>
+        <table class="score_table" style='margin: 0px auto;'>
+            {% for row in score_list %}
+            <tr>
+                {% for val in row %}
+                <td> {{ val }} </td>
+                {% endfor %}
+            </tr>
             {% endfor %}
-        </tr>
-        {% endfor %}
-    </table>
+        </table>
+        <br />
+    </div>
     {% endfor %}
 
 {% endblock %}

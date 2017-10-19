@@ -60,7 +60,7 @@ class GorothAnalyzer(BossAnalyzer):
                     distance = self.distance_calculation(target_location.location, locations[marked_target].location)
 
                     if distance < 1000:
-                        score_obj = self.score_objs.get(event.target)
+                        score_obj = self.score_objs.get(marked_target)
                         score_obj.splashing_from_meteors -= 10
 
     def not_hiding(self):

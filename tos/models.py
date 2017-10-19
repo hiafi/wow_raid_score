@@ -28,6 +28,46 @@ class GorothScore(RaidScore):
         }
 
 
+class HarjatanScore(RaidScore):
+    soaking_slams = models.IntegerField(default=0)
+    stacks_of_debuff = models.IntegerField(default=0)
+
+    @property
+    def table_keys(self):
+        return [
+            "Soaking slams", "Debuff stacks"
+        ]
+
+    @property
+    def score_dict(self):
+        return {
+            "Soaking slams": self.soaking_slams,
+            "Debuff stacks": self.stacks_of_debuff,
+        }
+
+
+class SistersScore(RaidScore):
+    glaive_storm = models.IntegerField(default=0)
+    twilight_glaive = models.IntegerField(default=0)
+    astral_vuln = models.IntegerField(default=0)
+    lunar_beacon = models.IntegerField(default=0)
+
+    @property
+    def table_keys(self):
+        return [
+            "Glaive Storm", "Twilight Glaive", "Lunar Beacon", "Astral Vulnerability"
+        ]
+
+    @property
+    def score_dict(self):
+        return {
+            "Glaive Storm": self.glaive_storm,
+            "Twilight Glaive": self.twilight_glaive,
+            "Lunar Beacon": self.lunar_beacon,
+            "Astral Vulnerability": self.astral_vuln,
+        }
+
+
 class MistressScore(RaidScore):
     bufferfish_uptime = models.IntegerField(default=0)
     dropoffs = models.IntegerField(default=0)

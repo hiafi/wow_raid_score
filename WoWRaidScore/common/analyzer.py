@@ -219,33 +219,56 @@ class BossAnalyzer(object):
                 return id
         return None
 
+    def _player_status_from_damage(self, player, timestamp, roll_back):
+        latest_event = None
+        for event in self.client.get_events(self.wcl_fight,
+                                            start_time=timestamp - roll_back,
+                                            end_time=timestamp,
+                                            filters={"type": [WCLEventTypes.damage, WCLEventTypes.heal], "target.name": player.name},
+                                            actors_obj_dict=self.actors):
+            if event.hp_remaining and event.point_x and event.point_y and not isinstance(event.target, int) and event.target_is_friendly:
+                latest_event = PlayerStatus(event)
+        return latest_event
+
+    def _player_status_from_cast(self, player, timestamp, roll_back, require_hp=True, require_loc=True):
+        latest_event = None
+        for event in self.client.get_events(self.wcl_fight,
+                                            start_time=timestamp - roll_back,
+                                            end_time=timestamp,
+                                            filters={"type": WCLEventTypes.cast, "target.name": player.name},
+                                            actors_obj_dict=self.actors):
+            try:
+                if event.point_x and event.point_y:
+                    latest_event = PlayerStatus(event)
+            except AttributeError:
+                pass
+        return latest_event
+
     def get_player_status_at_time(self, player, timestamp, time_to_look_back=None):
         if time_to_look_back is None:
-            time_to_look_back = (2000, 6000)
+            time_to_look_back = (1000, 2000, 5000)
         if isinstance(time_to_look_back, int):
             time_to_look_back = (time_to_look_back,)
+        latest_event = None
         for advancing_rollback in time_to_look_back:
-            for event in self.client.get_events(self.wcl_fight,
-                                                start_time=timestamp-advancing_rollback,
-                                                end_time=timestamp,
-                                                filters={"type": WCLEventTypes.damage, "target.name": player.name},
-                                                actors_obj_dict=self.actors):
-                if event.hp_remaining and event.point_x:
-                    return PlayerStatus(event)
-        return None
+            latest_event = self._player_status_from_damage(player, timestamp, advancing_rollback)
+            if latest_event:
+                return latest_event
+        return latest_event
 
     def get_all_player_status_at_time(self, timestamp, time_to_look_back=None):
         status = {}
         if time_to_look_back is None:
-            time_to_look_back = (2000, 6000)
+            time_to_look_back = (1000, 2000, 5000)
         if isinstance(time_to_look_back, int):
             time_to_look_back = (time_to_look_back,)
         for advancing_rollback in time_to_look_back:
             for event in self.client.get_events(self.wcl_fight,
                                                 start_time=timestamp-advancing_rollback,
                                                 end_time=timestamp,
-                                                filters={"type": WCLEventTypes.damage, "target.disposition": "friendly"},
+                                                filters={"type": [WCLEventTypes.damage, WCLEventTypes.heal], "target.disposition": "friendly"},
                                                 actors_obj_dict=self.actors):
+
                 if event.hp_remaining and event.point_x and not isinstance(event.target, int) and event.target_is_friendly:
                     status[event.target] = PlayerStatus(event)
         return status

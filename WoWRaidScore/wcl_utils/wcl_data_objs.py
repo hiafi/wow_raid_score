@@ -12,6 +12,8 @@ class WCLEventTypes(object):
     death = "death"
     cast = "cast"
     combatant_info = "combatantinfo"
+    absorb = "absorbed"
+    heal = "heal"
 
 
 class WCLRaid(object):
@@ -150,9 +152,14 @@ class WCLTargetEvent(object):
             source_name = unidecode(self.target.name)
         return source_name
 
+    @property
+    def readable_timestamp(self):
+        secs = self.timestamp/1000
+        return "{}:{:02d}".format(int(secs / 60), int(secs % 60))
+
     def __str__(self):
         return "<Event {}: {}->{} {}>".format(self.type, self.safe_source, self.safe_target,
-                                                 self.timestamp)
+                                                 self.readable_timestamp)
 
     def __repr__(self):
         return self.__str__()
@@ -166,7 +173,7 @@ class WCLAbilityEventObj(WCLTargetEvent):
 
     def __str__(self):
         return "<Event {}: {} {}->{} {}>".format(self.type, self.name, self.safe_source, self.safe_target,
-                                                 self.timestamp)
+        self.readable_timestamp)
 
 
 class WCLApplyDebuffEvent(WCLAbilityEventObj):
@@ -178,6 +185,9 @@ class WCLApplyDebuffStackEvent(WCLAbilityEventObj):
     def __init__(self, data, actor_objs_dict=None):
         super(WCLAbilityEventObj, self).__init__(data, actor_objs_dict)
         self.stack = data.get("stack")
+
+    def __str__(self):
+        return "<ApplyDebuffStack {} ({}), {} -> {} ({})>".format(self.name, self.stack, self.safe_source, self.safe_target, self.readable_timestamp)
 
 
 class WCLRemoveDebuffEvent(WCLAbilityEventObj):
@@ -192,16 +202,14 @@ class WCLDispelEvent(WCLAbilityEventObj):
     pass
 
 
-class WCLDamageEvent(WCLAbilityEventObj):
+class AbilityEventWithStatus(WCLAbilityEventObj):
     def __init__(self, data, actor_objs_dict=None):
-        super(WCLAbilityEventObj, self).__init__(data, actor_objs_dict)
-        self.tick = data.get("tick")
+        super(AbilityEventWithStatus, self).__init__(data, actor_objs_dict)
         self.point_x = data.get("x")
         self.point_y = data.get("y")
-        self.hit_type = data.get("hitType")
-        self.damage_total = data.get("amount") + data.get("absorbed")
         self.hp_remaining = data.get("hitPoints")
         self.hp_max = data.get("maxHitPoints")
+
 
     @property
     def hp_percent(self):
@@ -211,23 +219,40 @@ class WCLDamageEvent(WCLAbilityEventObj):
     def location(self):
         return (self.point_x, self.point_y)
 
+
+class WCLDamageEvent(AbilityEventWithStatus):
+    def __init__(self, data, actor_objs_dict=None):
+        super(WCLDamageEvent, self).__init__(data, actor_objs_dict)
+        self.tick = data.get("tick")
+        self.hit_type = data.get("hitType")
+        self.damage_total = data.get("amount") + data.get("absorbed")
+
     def __str__(self):
         return "<WCLDamageEvent{} {} {}->{} for {} damage. ({})>".format(" (tick)" if self.tick else "", self.name,
                                                                          self.safe_source, self.safe_target,
-                                                                         self.damage_total, self.timestamp)
+                                                                         self.damage_total, self.readable_timestamp)
 
 
-class WCLCastEvent(WCLTargetEvent):
-
+class WCLAbsorbEvent(WCLAbilityEventObj):
     def __init__(self, data, actor_objs_dict=None):
-        super(WCLCastEvent, self).__init__(data, actor_objs_dict)
-        self.name = data.get("ability", {}).get("name")
-        self.point_x = data.get("x")
-        self.point_y = data.get("y")
+        super(WCLAbsorbEvent, self).__init__(data, actor_objs_dict)
+
+
+class WCLHealEvent(AbilityEventWithStatus):
+    def __init__(self, data, actor_objs_dict=None):
+        super(WCLHealEvent, self).__init__(data, actor_objs_dict)
+        self.tick = data.get("tick")
+        self.hit_type = data.get("hitType")
+        self.amount_healed = data.get("amount", 0)
+        self.overheal = data.get("overheal", 0)
+        self.total_healing = self.amount_healed + self.overheal
+
+
+class WCLCastEvent(AbilityEventWithStatus):
 
     def __str__(self):
         return "<WCLCastEvent {} {}->{} {}>".format(self.name, self.safe_source, self.safe_target,
-                                                    self.timestamp)
+                                                    self.readable_timestamp)
 
 
 class WCLDeathEvent(WCLTargetEvent):

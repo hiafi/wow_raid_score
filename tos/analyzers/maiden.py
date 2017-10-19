@@ -132,6 +132,6 @@ class MaidenAnalyzer(BossAnalyzer):
                 number_affected += 1
                 if number_affected > 3 and found_timestamp is None:
                     found_timestamp = last_timestamp
-                    player_status = self.get_all_player_status_at_time(last_timestamp, time_to_look_back=2000)
+                    player_status = self.get_all_player_status_at_time(last_timestamp)
                     print(player_status)
 

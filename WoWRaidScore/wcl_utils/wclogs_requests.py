@@ -4,7 +4,7 @@ from datetime import datetime
 
 from WoWRaidScore.wcl_utils.wcl_data_objs import WCLEventTypes, WCLRaid, WCLFight, WCLPlayer, WCLApplyDebuffEvent, \
     WCLDamageEvent, WCLEnemy, WCLRemoveDebuffEvent, WCLDeathEvent, WCLCastEvent, WCLPlayerFightInfo, \
-    WCLApplyDebuffStackEvent, WCLInterruptEvent, WCLDispelEvent
+    WCLApplyDebuffStackEvent, WCLInterruptEvent, WCLDispelEvent, WCLAbsorbEvent, WCLHealEvent
 
 from collections import defaultdict
 
@@ -137,7 +137,9 @@ class WCLRequests(object):
             WCLEventTypes.death: WCLDeathEvent,
             WCLEventTypes.dispel: WCLDispelEvent,
             WCLEventTypes.cast: WCLCastEvent,
-            WCLEventTypes.combatant_info: WCLPlayerFightInfo
+            WCLEventTypes.combatant_info: WCLPlayerFightInfo,
+            WCLEventTypes.absorb: WCLAbsorbEvent,
+            WCLEventTypes.heal: WCLHealEvent
 
         }
         cls = types.get(data.get("type"))
@@ -176,6 +178,21 @@ class WCLRequests(object):
         )
         return self._get_json_data_from_wcl(url)
 
+    def _get_table_json(self, view, start_time, end_time, filters):
+        additional_data = "{filter}".format(
+            filter=WCLRequests._build_filters(filters))
+
+        url = "{base_url}/report/tables/{view}/{raid_id}?api_key={api_key}&start={start_time}&end={end_time}{additional}".format(
+            base_url=WCLRequests.base_url(),
+            raid_id=self.raid_id,
+            api_key=API_KEY,
+            start_time=start_time,
+            end_time=end_time,
+            view=view,
+            additional=additional_data
+        )
+        return self._get_json_data_from_wcl(url)
+
     def get_events(self, fight, actor_id=None, filters=None, actors_obj_dict=None, start_time=None, end_time=None):
         if start_time is None:
             start_time = fight.start_time_str
@@ -183,15 +200,28 @@ class WCLRequests(object):
             end_time = fight.end_time_str
         r_json = self._get_event_json(start_time, end_time, actor_id, filters)
         events = r_json.get("events")
+        next_timestamp = 0
         while events:
             for event in events:
                 yield self._create_event_obj(event, actors_obj_dict=actors_obj_dict)
-            next_timestamp = r_json.get("nextPageTimestamp")
+            if next_timestamp != r_json.get("nextPageTimestamp"):
+                next_timestamp = r_json.get("nextPageTimestamp")
+            else:
+                next_timestamp = None
+
             if next_timestamp:
-                data = self._get_event_json(next_timestamp, end_time, actor_id, filters)
-                events = data.get("events")
+                r_json = self._get_event_json(next_timestamp, end_time, actor_id, filters)
+                events = r_json.get("events")
             else:
                 events = []
+
+    def get_table_data(self, fight, view, filters=None, start_time=None, end_time=None):
+        if start_time is None:
+            start_time = fight.start_time_str
+        if end_time is None:
+            end_time = fight.end_time_str
+        data = self._get_table_json(view, start_time, end_time, filters)
+        print(data)
 
     def get_death_times(self, fight, actors_obj_dict=None):
         deaths = {}

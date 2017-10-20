@@ -65,12 +65,12 @@ class SpecInfo(object):
 
 
 class BossAnalyzer(object):
-    DEBUG = True
+    DEBUG = False
     SCORE_OBJ = RaidScore
     STOP_AT_DEATH = 7
 
-    NORMAL_DIFFICULTY = 1
-    HEROIC_DIFFICULTY = 2
+    NORMAL_DIFFICULTY = 3
+    HEROIC_DIFFICULTY = 4
     MYTHIC_DIFFICULTY = 5
 
     def debug_message(self, message):
@@ -91,6 +91,12 @@ class BossAnalyzer(object):
     @staticmethod
     def distance_calculation(coord1, coord2):
         return math.sqrt(math.pow(coord2[0] - coord1[0], 2) + math.pow(coord2[1] - coord1[1], 2))
+
+    @staticmethod
+    def angle_between_points(origin, destination):
+        hyp = BossAnalyzer.distance_calculation(origin, destination)
+        opp = float(destination[1] - origin[1])
+        return math.degrees(math.asin(opp/hyp))
 
     @staticmethod
     def between_duration(start_time, end_time, time_to_check):

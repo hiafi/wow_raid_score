@@ -6,6 +6,8 @@ class WCLEventTypes(object):
     apply_debuff = "applydebuff"
     apply_debuff_stack = "applydebuffstack"
     remove_debuff = "removedebuff"
+    apply_buff = "applybuff"
+    remove_buff = "removebuff"
     interrupt = "interrupt"
     dispel = "dispel"
     damage = "damage"
@@ -14,6 +16,7 @@ class WCLEventTypes(object):
     combatant_info = "combatantinfo"
     absorb = "absorbed"
     heal = "heal"
+    resource_gain = ""
 
 
 class WCLRaid(object):
@@ -88,7 +91,12 @@ class WCLPlayer(WCLActor):
 
 
 class WCLEnemy(WCLActor):
-    pass
+    def __init__(self, data):
+        super(WCLEnemy, self).__init__(data)
+        self.instance = None
+
+    def __str__(self):
+        return "<Enemy: {}>".format(unidecode(self.name))
 
 
 class WCLPlayerFightInfo(object):
@@ -130,6 +138,8 @@ class WCLTargetEvent(object):
         self.target = data.get("targetID")
         self.source_is_friendly = data.get("sourceIsFriendly")
         self.target_is_friendly = data.get("targetIsFriendly")
+        self.source_instance = data.get("sourceInstance")
+        self.target_instance = data.get("targetInstance")
         if actor_objs_dict is not None:
             self.source = actor_objs_dict.get(self.source, self.source)
             self.target = actor_objs_dict.get(self.target, self.target)
@@ -191,6 +201,14 @@ class WCLApplyDebuffStackEvent(WCLAbilityEventObj):
 
 
 class WCLRemoveDebuffEvent(WCLAbilityEventObj):
+    pass
+
+
+class WCLApplyBuffEvent(WCLAbilityEventObj):
+    pass
+
+
+class WCLRemoveBuffEvent(WCLAbilityEventObj):
     pass
 
 
@@ -260,3 +278,26 @@ class WCLDeathEvent(WCLTargetEvent):
 
     def __str__(self):
         return "<WCLDeathEvent {} killed {}>".format(self.safe_source, self.safe_target)
+
+
+def create_event_obj(data, actors_obj_dict):
+    types = {
+        WCLEventTypes.apply_debuff: WCLApplyDebuffEvent,
+        WCLEventTypes.apply_debuff_stack: WCLApplyDebuffStackEvent,
+        WCLEventTypes.remove_debuff: WCLRemoveDebuffEvent,
+        WCLEventTypes.damage: WCLDamageEvent,
+        WCLEventTypes.interrupt: WCLInterruptEvent,
+        WCLEventTypes.death: WCLDeathEvent,
+        WCLEventTypes.dispel: WCLDispelEvent,
+        WCLEventTypes.cast: WCLCastEvent,
+        WCLEventTypes.combatant_info: WCLPlayerFightInfo,
+        WCLEventTypes.absorb: WCLAbsorbEvent,
+        WCLEventTypes.heal: WCLHealEvent,
+        WCLEventTypes.apply_buff: WCLApplyBuffEvent,
+        WCLEventTypes.remove_buff: WCLRemoveBuffEvent
+
+    }
+    cls = types.get(data.get("type"))
+    if cls:
+        return cls(data, actors_obj_dict)
+    return data

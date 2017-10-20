@@ -25,7 +25,7 @@ class SistersAnalyzer(BossAnalyzer):
                                                 "type": WCLEventTypes.damage,
                                                 "ability.id": 236480
                                             }, actors_obj_dict=self.actors):
-            self.score_objs.get(event.target).glaive_storm -= 10
+            self.score_objs.get(event.target).glaive_storm -= 5
 
     def lunar_beacon(self):
         start_timestamp = None
@@ -48,13 +48,13 @@ class SistersAnalyzer(BossAnalyzer):
                     distance = self.distance_calculation(status_at_start.location, status_at_end.location)
                     distance_from_center = self.distance_calculation(status_at_start.location, self.CENTER_OF_ROOM)
                     if distance_from_center > 2000 and distance < 50:
-                        score_val = 20
-                    elif distance_from_center > 2000 and distance < 500:
                         score_val = 10
+                    elif distance_from_center > 2000 and distance < 500:
+                        score_val = 5
                     elif distance_from_center > 1500 and distance < 800:
                         score_val = 0
                     elif distance_from_center < 1500 or distance > 1500:
-                        score_val = -20
+                        score_val = -15
 
                     self.score_objs.get(event.target).lunar_beacon += score_val
                 else:

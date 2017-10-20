@@ -26,27 +26,33 @@ def get_progress(current_analyzer, num_analyzers, percentage_start):
     return int(float(current_analyzer) / num_analyzers * percentage_start)
 
 
-def parse_raid_task(raid_id, user_id, group_id, overwrite=True, update_progress=True):
+def _get_raid_obj(wcl_client, raid_id, user_id, group_id, delete_fights, overwrite):
     user = User.objects.get(id=user_id)
     if group_id:
         group = Group.objects.get(id=group_id)
     else:
         group = None
-    wcl_client = WCLRequests(raid_id)
-    update_status(0.0, update_progress)
     try:
         raid = Raid.objects.get(raid_id=raid_id)
-        if overwrite:
-            for fight in Fight.objects.filter(raid=raid):
-                for raid_score in RaidScore.objects.filter(fight=fight):
-                    raid_score.delete()
-                fight.delete()
-        else:
-            raise Exception("The raid has already been parsed")
+        if delete_fights:
+            if overwrite:
+                for fight in Fight.objects.filter(raid=raid):
+                    for raid_score in RaidScore.objects.filter(fight=fight):
+                        raid_score.delete()
+                    fight.delete()
+            else:
+                raise Exception("The raid has already been parsed")
     except ObjectDoesNotExist:
         wcl_raid = wcl_client.get_raid_info()
         raid = Raid(raid_id=raid_id, time=wcl_raid.start_time, user=user, group=group)
         raid.save()
+    return raid
+
+
+def parse_raid_task(raid_id, user_id, group_id, overwrite=True, update_progress=True):
+    wcl_client = WCLRequests(raid_id)
+    update_status(0.0, update_progress)
+    raid = _get_raid_obj(wcl_client, raid_id, user_id, group_id, delete_fights=True, overwrite=overwrite)
     update_status(2.0, update_progress)
     fights = wcl_client.get_fights()
     update_status(5.0, update_progress)
@@ -61,11 +67,9 @@ def parse_raid_task(raid_id, user_id, group_id, overwrite=True, update_progress=
 
 def update_raid_to_current(raid_id, user_id, group_id, update_progress=True):
     update_status(0, update_progress)
-    try:
-        raid = Raid.objects.get(raid_id=raid_id)
-    except ObjectDoesNotExist:
-        raise Exception("Raid has not been created")
     wcl_client = WCLRequests(raid_id)
+    raid = _get_raid_obj(wcl_client, raid_id, user_id, group_id, delete_fights=False, overwrite=False)
+
     wcl_fights = {f.id: f for f in wcl_client.get_fights().values()}
     to_process = set(wcl_fights.values())
     for fight_obj in Fight.objects.filter(raid=raid):

@@ -28,7 +28,7 @@ class GorothAnalyzer(BossAnalyzer):
                                                 "ability.name": "Rain of Brimstone"
                                             }, actors_obj_dict=self.actors):
             score_obj = self.score_objs.get(event.target)
-            score_obj.soaking_infernals += 20
+            score_obj.soaking_infernals += 10
 
     def splashing_others_with_meteor(self):
         recent_debuff = 0

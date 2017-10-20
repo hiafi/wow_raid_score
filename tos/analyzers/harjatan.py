@@ -21,7 +21,7 @@ class HarjatanAnalyzer(BossAnalyzer):
                                                 "ability.id": 231854
                                             }, actors_obj_dict=self.actors):
             score_obj = self.score_objs.get(event.target)
-            score_obj.soaking_slams += 20
+            score_obj.soaking_slams += 10
 
     def debuff_stacks(self):
         stacks_over_5 = defaultdict(int)
@@ -37,6 +37,6 @@ class HarjatanAnalyzer(BossAnalyzer):
                 stacks_over_5[event.target] += 1
 
         for actor, under_10 in stacks_over_5.items():
-            self.score_objs.get(actor).stacks_of_debuff -= int(0.5 * under_10)
+            self.score_objs.get(actor).stacks_of_debuff -= int(0.25 * under_10)
         for actor, over_10 in stacks_over_10.items():
-            self.score_objs.get(actor).stacks_of_debuff -= int(1 * over_10)
+            self.score_objs.get(actor).stacks_of_debuff -= int(0.5 * over_10)

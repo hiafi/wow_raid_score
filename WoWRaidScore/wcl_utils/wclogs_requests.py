@@ -2,9 +2,7 @@ import requests
 import time
 from datetime import datetime
 
-from WoWRaidScore.wcl_utils.wcl_data_objs import WCLEventTypes, WCLRaid, WCLFight, WCLPlayer, WCLApplyDebuffEvent, \
-    WCLDamageEvent, WCLEnemy, WCLRemoveDebuffEvent, WCLDeathEvent, WCLCastEvent, WCLPlayerFightInfo, \
-    WCLApplyDebuffStackEvent, WCLInterruptEvent, WCLDispelEvent, WCLAbsorbEvent, WCLHealEvent
+from WoWRaidScore.wcl_utils.wcl_data_objs import WCLEventTypes, WCLRaid, WCLFight, WCLPlayer, WCLEnemy, create_event_obj
 
 from collections import defaultdict
 
@@ -126,27 +124,6 @@ class WCLRequests(object):
                                                   filter_name, filter_value in filters.items()]))
         return ""
 
-    @staticmethod
-    def _create_event_obj(data, actors_obj_dict):
-        types = {
-            WCLEventTypes.apply_debuff: WCLApplyDebuffEvent,
-            WCLEventTypes.apply_debuff_stack: WCLApplyDebuffStackEvent,
-            WCLEventTypes.remove_debuff: WCLRemoveDebuffEvent,
-            WCLEventTypes.damage: WCLDamageEvent,
-            WCLEventTypes.interrupt: WCLInterruptEvent,
-            WCLEventTypes.death: WCLDeathEvent,
-            WCLEventTypes.dispel: WCLDispelEvent,
-            WCLEventTypes.cast: WCLCastEvent,
-            WCLEventTypes.combatant_info: WCLPlayerFightInfo,
-            WCLEventTypes.absorb: WCLAbsorbEvent,
-            WCLEventTypes.heal: WCLHealEvent
-
-        }
-        cls = types.get(data.get("type"))
-        if cls:
-            return cls(data, actors_obj_dict)
-        return data
-
     def _get_json_data_from_wcl(self, url, max_attempts=5):
         json_data = None
         attempts = max_attempts
@@ -203,7 +180,7 @@ class WCLRequests(object):
         next_timestamp = 0
         while events:
             for event in events:
-                yield self._create_event_obj(event, actors_obj_dict=actors_obj_dict)
+                yield create_event_obj(event, actors_obj_dict=actors_obj_dict)
             if next_timestamp != r_json.get("nextPageTimestamp"):
                 next_timestamp = r_json.get("nextPageTimestamp")
             else:

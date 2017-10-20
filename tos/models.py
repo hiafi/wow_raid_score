@@ -28,6 +28,28 @@ class GorothScore(RaidScore):
         }
 
 
+class DIScore(RaidScore):
+    interrupts = models.IntegerField(default=0)
+    grouping_jail = models.IntegerField(default=0)
+    explosive_anguish = models.IntegerField(default=0)
+    times_in_jail = models.IntegerField(default=0)
+
+    @property
+    def table_keys(self):
+        return [
+            "Times in jail", "Explosive Anguish", "Going to jail in a group", "Interrupts"
+        ]
+
+    @property
+    def score_dict(self):
+        return {
+            "Times in jail": self.times_in_jail,
+            "Explosive Anguish": self.explosive_anguish,
+            "Going to jail in a group": self.grouping_jail,
+            "Interrupts": self.interrupts
+        }
+
+
 class HarjatanScore(RaidScore):
     soaking_slams = models.IntegerField(default=0)
     stacks_of_debuff = models.IntegerField(default=0)
@@ -78,14 +100,17 @@ class HostScore(RaidScore):
     @property
     def table_keys(self):
         return [
-            "Dissonance", "Breaking Armors"
+            "Dissonance", "Breaking Armors", "Soulbind", "Rupturing Slams", "Tormented Cries"
         ]
 
     @property
     def score_dict(self):
         return {
-            "Soaking slams": self.soaking_slams,
-            "Debuff stacks": self.stacks_of_debuff,
+            "Dissonance": self.dissonance,
+            "Breaking Armors": self.break_armors,
+            "Soulbind": self.soulbinds,
+            "Rupturing Slams": self.rupturing_slam,
+            "Tormented Cries": self.tormented_cries,
         }
 
 class MistressScore(RaidScore):

@@ -100,7 +100,7 @@ class WCLEnemy(WCLActor):
 
 
 class WCLPlayerFightInfo(object):
-    def __init__(self, data, actor_objs_dict=None):
+    def __init__(self, data, fight, actor_objs_dict=None):
         self.source = data.get("sourceID")
         self.spec_id = data.get("specID")
         self.speed = data.get("speed", 0)
@@ -129,11 +129,12 @@ class WCLPlayerFightInfo(object):
 
 
 class WCLTargetEvent(object):
-    def __init__(self, data, actor_objs_dict=None):
+    def __init__(self, data, fight, actor_objs_dict=None):
         self.type = data.get("type")
         self.name = data.get("ability", {}).get("name")
         self.id = data.get("ability", {}).get("guid")
         self.timestamp = data.get("timestamp")
+        self.start_of_fight = fight.start_time_str
         self.source = data.get("sourceID")
         self.target = data.get("targetID")
         self.source_is_friendly = data.get("sourceIsFriendly")
@@ -164,7 +165,7 @@ class WCLTargetEvent(object):
 
     @property
     def readable_timestamp(self):
-        secs = self.timestamp/1000
+        secs = (self.timestamp - self.start_of_fight)/1000
         return "{}:{:02d}".format(int(secs / 60), int(secs % 60))
 
     def __str__(self):
@@ -176,8 +177,8 @@ class WCLTargetEvent(object):
 
 
 class WCLAbilityEventObj(WCLTargetEvent):
-    def __init__(self, data, actor_objs_dict=None):
-        super(WCLAbilityEventObj, self).__init__(data, actor_objs_dict)
+    def __init__(self, data, fight, actor_objs_dict=None):
+        super(WCLAbilityEventObj, self).__init__(data, fight, actor_objs_dict)
         self.name = data.get("ability", {}).get("name")
         self.id = data.get("ability", {}).get("guid")
 
@@ -187,13 +188,12 @@ class WCLAbilityEventObj(WCLTargetEvent):
 
 
 class WCLApplyDebuffEvent(WCLAbilityEventObj):
-    def __init__(self, data, actor_objs_dict=None):
-        super(WCLAbilityEventObj, self).__init__(data, actor_objs_dict)
+    pass
 
 
 class WCLApplyDebuffStackEvent(WCLAbilityEventObj):
-    def __init__(self, data, actor_objs_dict=None):
-        super(WCLAbilityEventObj, self).__init__(data, actor_objs_dict)
+    def __init__(self, data, fight, actor_objs_dict=None):
+        super(WCLAbilityEventObj, self).__init__(data, fight, actor_objs_dict)
         self.stack = data.get("stack")
 
     def __str__(self):
@@ -221,8 +221,8 @@ class WCLDispelEvent(WCLAbilityEventObj):
 
 
 class AbilityEventWithStatus(WCLAbilityEventObj):
-    def __init__(self, data, actor_objs_dict=None):
-        super(AbilityEventWithStatus, self).__init__(data, actor_objs_dict)
+    def __init__(self, data, fight, actor_objs_dict=None):
+        super(AbilityEventWithStatus, self).__init__(data, fight, actor_objs_dict)
         self.point_x = data.get("x")
         self.point_y = data.get("y")
         self.hp_remaining = data.get("hitPoints")
@@ -239,31 +239,37 @@ class AbilityEventWithStatus(WCLAbilityEventObj):
 
 
 class WCLDamageEvent(AbilityEventWithStatus):
-    def __init__(self, data, actor_objs_dict=None):
-        super(WCLDamageEvent, self).__init__(data, actor_objs_dict)
+    def __init__(self, data, fight, actor_objs_dict=None):
+        super(WCLDamageEvent, self).__init__(data, fight, actor_objs_dict)
         self.tick = data.get("tick")
         self.hit_type = data.get("hitType")
-        self.damage_total = data.get("amount") + data.get("absorbed")
+        self.damage_done = data.get("amount")
+        self.damage_total = self.damage_done + data.get("absorbed")
+
 
     def __str__(self):
         return "<WCLDamageEvent{} {} {}->{} for {} damage. ({})>".format(" (tick)" if self.tick else "", self.name,
                                                                          self.safe_source, self.safe_target,
-                                                                         self.damage_total, self.readable_timestamp)
+                                                                         self.damage_done, self.readable_timestamp)
 
 
 class WCLAbsorbEvent(WCLAbilityEventObj):
-    def __init__(self, data, actor_objs_dict=None):
-        super(WCLAbsorbEvent, self).__init__(data, actor_objs_dict)
+    pass
 
 
 class WCLHealEvent(AbilityEventWithStatus):
-    def __init__(self, data, actor_objs_dict=None):
-        super(WCLHealEvent, self).__init__(data, actor_objs_dict)
+    def __init__(self, data, fight, actor_objs_dict=None):
+        super(WCLHealEvent, self).__init__(data, fight, actor_objs_dict)
         self.tick = data.get("tick")
         self.hit_type = data.get("hitType")
         self.amount_healed = data.get("amount", 0)
         self.overheal = data.get("overheal", 0)
         self.total_healing = self.amount_healed + self.overheal
+
+    def __str__(self):
+        return "<WCLHealEvent{} {} {}->{} for {} health. ({})>".format(" (tick)" if self.tick else "", self.name,
+                                                                         self.safe_source, self.safe_target,
+                                                                         self.amount_healed, self.readable_timestamp)
 
 
 class WCLCastEvent(AbilityEventWithStatus):
@@ -274,13 +280,12 @@ class WCLCastEvent(AbilityEventWithStatus):
 
 
 class WCLDeathEvent(WCLTargetEvent):
-    pass
 
     def __str__(self):
         return "<WCLDeathEvent {} killed {}>".format(self.safe_source, self.safe_target)
 
 
-def create_event_obj(data, actors_obj_dict):
+def create_event_obj(data, fight, actors_obj_dict):
     types = {
         WCLEventTypes.apply_debuff: WCLApplyDebuffEvent,
         WCLEventTypes.apply_debuff_stack: WCLApplyDebuffStackEvent,
@@ -299,5 +304,5 @@ def create_event_obj(data, actors_obj_dict):
     }
     cls = types.get(data.get("type"))
     if cls:
-        return cls(data, actors_obj_dict)
+        return cls(data, fight, actors_obj_dict)
     return data

@@ -202,7 +202,7 @@ class MistressAnalyzer(BossAnalyzer):
                 bufferfish_for_player = bufferfish.get(event.target)
                 if bufferfish_for_player:
                     for bf_time in bufferfish_for_player:
-                        if self.between_duration(bf_time[0], bf_time[1], event.timestamp):
+                        if self.between_duration(bf_time[0], event.timestamp, bf_time[1]):
                             valid = False
             else:
                 valid = False
@@ -221,7 +221,7 @@ class MistressAnalyzer(BossAnalyzer):
         existing_timestamps = [(timestamp - 10000, timestamp + 10000) for timestamp, number_hit in number_of_people_hit_at_times.items() if number_hit > 5]
         for player, timestamps in times_people_were_hit.items():
             for timestamp in timestamps:
-                if not self.between_multiple_durations(existing_timestamps, timestamp):
+                if not self.between_multiple_durations(timestamp, existing_timestamps):
                     score_obj = self.score_objs.get(player)
                     score_obj.tornado_damage -= 30
 
@@ -234,7 +234,7 @@ class MistressAnalyzer(BossAnalyzer):
 
             if not self.check_for_wipe(event):
                 score_obj = self.score_objs.get(event.target)
-                if self.between_multiple_durations(self.get_stun_times().get(event.target, []), event.timestamp):
+                if self.between_multiple_durations(event.timestamp, self.get_stun_times().get(event.target, [])):
                     score_obj.hit_by_giant_fish -= 10
                 else:
                     score_obj.hit_by_giant_fish -= 40

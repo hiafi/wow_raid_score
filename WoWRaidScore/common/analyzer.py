@@ -1,5 +1,6 @@
 from WoWRaidScore.models import RaidScore
 from WoWRaidScore.wcl_utils.wcl_data_objs import WCLEventTypes
+from collections import defaultdict
 
 import math
 
@@ -84,9 +85,11 @@ class BossAnalyzer(object):
         self.actors = actors
 
         self._cached_deaths = {}
+        self._cached_status = defaultdict(dict)
 
     def cleanup(self):
         self._cached_deaths = {}
+        self._cached_status = {}
 
     @staticmethod
     def distance_calculation(coord1, coord2):
@@ -99,15 +102,37 @@ class BossAnalyzer(object):
         return math.degrees(math.asin(opp/hyp))
 
     @staticmethod
-    def between_duration(start_time, end_time, time_to_check):
+    def between_duration(start_time, time_to_check, end_time):
         return start_time <= time_to_check <= end_time
 
     @staticmethod
-    def between_multiple_durations(durations, time_to_check):
+    def between_multiple_durations(time_to_check, durations):
         for (start_time, end_time) in durations:
             if start_time <= time_to_check <= end_time:
                 return True
         return False
+
+    def get_debuff_start_and_end(self, ability_name, target=None):
+        debuffs = defaultdict(list)
+        tmp_store = {}
+        if target is not None:
+            actor_id = self.get_actor_id(target)
+        else:
+            actor_id = None
+        for event in self.client.get_events(self.wcl_fight, actor_id=actor_id,
+                                            filters={
+                                                "type": [WCLEventTypes.apply_debuff, WCLEventTypes.remove_debuff],
+                                                "ability.name": ability_name
+                                            }, actors_obj_dict=self.actors):
+            if event.type == WCLEventTypes.apply_debuff:
+                tmp_store[event.target] = event.timestamp
+            else:
+                debuffs[event.target].append((tmp_store.get(event.target), event.timestamp))
+                tmp_store[event.target] = None
+        for person, start_time in tmp_store.items():
+            if start_time is not None:
+                debuffs[person].append((start_time, self.wcl_fight.end_time_str))
+        return debuffs
 
     def check_for_wipe(self, event, death_count=None, time_count=None, ignore_percent=20.0):
         """
@@ -212,10 +237,10 @@ class BossAnalyzer(object):
 
     def get_wipe_time(self, number_of_deaths=None):
         if number_of_deaths is None:
-            number_of_deaths = int(len(self.score_objs) * 0.35)
+            number_of_deaths = int(len(self.score_objs) * 0.30)
         death_order = self.get_player_death_order()
         death_time = None
-        if len(death_order) > number_of_deaths:
+        if len(death_order) >= number_of_deaths:
             death_time = self.get_player_death_times().get(death_order[number_of_deaths])
         return death_time
 
@@ -250,7 +275,9 @@ class BossAnalyzer(object):
                 pass
         return latest_event
 
-    def get_player_status_at_time(self, player, timestamp, time_to_look_back=None):
+    def get_player_status_at_time(self, player, timestamp, time_to_look_back=None, cache=False):
+        if self._cached_status.get(timestamp, {}).get(player):
+            return self._cached_status.get(timestamp, {}).get(player)
         if time_to_look_back is None:
             time_to_look_back = (1000, 2000, 5000)
         if isinstance(time_to_look_back, int):
@@ -259,11 +286,15 @@ class BossAnalyzer(object):
         for advancing_rollback in time_to_look_back:
             latest_event = self._player_status_from_damage(player, timestamp, advancing_rollback)
             if latest_event:
-                return latest_event
+                break
+        if cache:
+            self._cached_status[timestamp][player] = latest_event
         return latest_event
 
-    def get_all_player_status_at_time(self, timestamp, time_to_look_back=None):
+    def get_all_player_status_at_time(self, timestamp, time_to_look_back=None, cache=False):
         status = {}
+        if self._cached_status.get(timestamp):
+            return self._cached_status.get(timestamp)
         if time_to_look_back is None:
             time_to_look_back = (1000, 2000, 5000)
         if isinstance(time_to_look_back, int):
@@ -277,6 +308,8 @@ class BossAnalyzer(object):
 
                 if event.hp_remaining and event.point_x and not isinstance(event.target, int) and event.target_is_friendly:
                     status[event.target] = PlayerStatus(event)
+        if cache:
+            self._cached_status[timestamp] = status
         return status
 
     def analyze(self):

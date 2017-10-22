@@ -62,14 +62,14 @@ class HostAnalyzer(BossAnalyzer):
             last_scream_target = (event.target, event.timestamp)
             to_remove = []
             for armored_target, bonecage_duration in bonecage_durations.items():
-                if self.between_duration(event.timestamp-100, event.timestamp+100, bonecage_duration[1]):
+                if self.between_duration(event.timestamp-100, bonecage_duration[1], event.timestamp+100):
                     to_remove.append(armored_target)
                     status = self.get_player_status_at_time(event.target, event.timestamp)
                     if status.point_x >= self.PHYSICAL_SIDE:
                         self.score_objs.get(event.target).break_armors += 8
                     else:
                         self.score_objs.get(event.target).break_armors += 2
-                elif self.between_duration(bonecage_duration[0]+3000, bonecage_duration[1]-5000, event.timestamp):
+                elif self.between_duration(bonecage_duration[0]+3000, event.timestamp, bonecage_duration[1]-5000):
                     if already_missed.get(event.target) != event.timestamp:
                         already_missed[event.target] = event.timestamp
                         self.score_objs.get(event.target).break_armors -= 6

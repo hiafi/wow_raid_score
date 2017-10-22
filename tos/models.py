@@ -75,6 +75,10 @@ class SistersScore(RaidScore):
     lunar_beacon = models.IntegerField(default=0)
 
     @property
+    def base_score(self):
+        return 100
+
+    @property
     def table_keys(self):
         return [
             "Glaive Storm", "Twilight Glaive", "Lunar Beacon", "Astral Vulnerability"
@@ -113,6 +117,7 @@ class HostScore(RaidScore):
             "Tormented Cries": self.tormented_cries,
         }
 
+
 class MistressScore(RaidScore):
     bufferfish_uptime = models.IntegerField(default=0)
     dropoffs = models.IntegerField(default=0)
@@ -123,6 +128,10 @@ class MistressScore(RaidScore):
     murlock_debuff_uptime = models.IntegerField(default=0)
     interrupts = models.IntegerField(default=0)
     dispels = models.IntegerField(default=0)
+
+    @property
+    def base_score(self):
+        return 50
 
     @property
     def table_keys(self):
@@ -144,18 +153,27 @@ class MistressScore(RaidScore):
 class MaidenScore(RaidScore):
     wrong_color = models.IntegerField(default=0)
     wrong_orb = models.IntegerField(default=0)
+    bomb_from_echos = models.IntegerField(default=0)
+    bomb_from_p1_orb = models.IntegerField(default=0)
+    right_orb = models.IntegerField(default=0)
     didnt_jump_in_hole = models.IntegerField(default=0)
+
+    @property
+    def base_score(self):
+        return 100
 
     @property
     def table_keys(self):
         return [
-            "Wrong side", "Wrong orb", "Bomb explosions"
+            "Bomb from other color players", "Wrong orb", "Bombs that exploded", "Bombs from echos", "bombs from phase 1 orbs"
         ]
 
     @property
     def score_dict(self):
         return {
-            "Wrong side": self.wrong_color,
+            "Bomb from other color players": self.wrong_color,
             "Wrong orb": self.wrong_orb,
-            "Bomb explosions": self.didnt_jump_in_hole,
+            "Bombs that exploded": self.didnt_jump_in_hole,
+            "Bombs from echos": self.bomb_from_echos,
+            "bombs from phase 1 orbs": self.bomb_from_p1_orb
         }

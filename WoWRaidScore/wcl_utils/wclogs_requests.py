@@ -180,7 +180,7 @@ class WCLRequests(object):
         next_timestamp = 0
         while events:
             for event in events:
-                yield create_event_obj(event, actors_obj_dict=actors_obj_dict)
+                yield create_event_obj(event, fight, actors_obj_dict=actors_obj_dict)
             if next_timestamp != r_json.get("nextPageTimestamp"):
                 next_timestamp = r_json.get("nextPageTimestamp")
             else:

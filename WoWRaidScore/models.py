@@ -85,9 +85,13 @@ class RaidScore(models.Model):
     objects = InheritanceManager()
 
     @property
+    def base_score(self):
+        return 0
+
+    @property
     def score_dict(self):
         return {}
 
     @property
     def total(self):
-        return sum(self.score_dict.values())
+        return self.base_score + sum(self.score_dict.values())

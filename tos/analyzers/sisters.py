@@ -48,9 +48,9 @@ class SistersAnalyzer(BossAnalyzer):
                     distance = self.distance_calculation(status_at_start.location, status_at_end.location)
                     distance_from_center = self.distance_calculation(status_at_start.location, self.CENTER_OF_ROOM)
                     if distance_from_center > 2000 and distance < 50:
-                        score_val = 10
+                        score_val = 2
                     elif distance_from_center > 2000 and distance < 500:
-                        score_val = 5
+                        score_val = 1
                     elif distance_from_center > 1500 and distance < 800:
                         score_val = 0
                     elif distance_from_center < 1500 or distance > 1500:

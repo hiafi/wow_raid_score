@@ -107,7 +107,7 @@ def view_player_details_for_raid(request, raid_id, player_id, boss_id):
     health_list = [score.fight.percent for score in score_objs]
     totals = _get_totals_for_player(score_objs)
 
-    context = {"player": player, "score_objs": score_objs, "totals": total_list,
+    context = {"player": player, "score_objs": score_objs, "totals": total_list, "base_score_total": sum([score.base_score for score in score_objs]),
                "health": health_list, "total_dict": totals}
     return render(request, "player_raid_view.html", context)
 

@@ -69,6 +69,7 @@ def _get_totals(score_objs):
         for key in keys:
             ft.append(fight_scores_dict.get(key))
         final_totals[boss].append(ft)
+    final_totals = sorted([(boss, total) for boss, total in final_totals.items()], key=lambda x: x[0].ordering)
     return dict(final_totals)
 
 

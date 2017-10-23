@@ -70,7 +70,7 @@ def _get_totals(score_objs):
             ft.append(fight_scores_dict.get(key))
         final_totals[boss].append(ft)
     final_totals = sorted([(boss, total) for boss, total in final_totals.items()], key=lambda x: x[0].ordering)
-    return dict(final_totals)
+    return final_totals
 
 
 def view_raid(request, raid_id):

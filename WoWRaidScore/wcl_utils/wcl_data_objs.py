@@ -246,7 +246,6 @@ class WCLDamageEvent(AbilityEventWithStatus):
         self.damage_done = data.get("amount")
         self.damage_total = self.damage_done + data.get("absorbed")
 
-
     def __str__(self):
         return "<WCLDamageEvent{} {} {}->{} for {} damage. ({})>".format(" (tick)" if self.tick else "", self.name,
                                                                          self.safe_source, self.safe_target,

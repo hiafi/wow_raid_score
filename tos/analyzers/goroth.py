@@ -57,7 +57,10 @@ class GorothAnalyzer(BossAnalyzer):
                         status = self.get_player_status_at_time(marked_target, event.timestamp+2000, time_to_look_back=3000)
                         if status:
                             locations[marked_target] = status
-                    distance = self.distance_calculation(target_location.location, locations[marked_target].location)
+                    if marked_target in locations:
+                        distance = self.distance_calculation(target_location.location, locations[marked_target].location)
+                    else:
+                        distance = 5000
 
                     if distance < 1000:
                         score_obj = self.score_objs.get(marked_target)

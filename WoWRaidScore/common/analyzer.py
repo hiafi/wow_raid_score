@@ -41,8 +41,8 @@ class SpecInfo(object):
     HUNTER_MM = 254
     HUNTER_SV = None
     MAGE_ARCANE = None
-    MAGE_FIRE = None
-    MAGE_FROST = None
+    MAGE_FIRE = 63
+    MAGE_FROST = 64
     MONK_MW = 270
     MONK_BM = 268
     MONK_WW = 269
@@ -187,7 +187,8 @@ class BossAnalyzer(object):
             SpecInfo.HUNTER_MM,
             265,  # affliction lock
             267,  # destruction lock
-            64,  # frost mage
+            SpecInfo.MAGE_FROST,
+            SpecInfo.MAGE_FIRE,
             262,  # Ele shaman
             SpecInfo.WARLOCK_DEMO,
         }

@@ -177,3 +177,59 @@ class MaidenScore(RaidScore):
             "Bombs from echos": self.bomb_from_echos,
             "bombs from phase 1 orbs": self.bomb_from_p1_orb
         }
+
+
+class AvatarScore(RaidScore):
+    touch_of_sargeras_soak = models.IntegerField(default=0)
+    unbound_chaos = models.IntegerField(default=0)
+    shadow_blades = models.IntegerField(default=0)
+    meteor_soak = models.IntegerField(default=0)
+    tornados = models.IntegerField(default=0)
+    dark_marks = models.IntegerField(default=0)
+
+    @property
+    def base_score(self):
+        return 0
+
+    @property
+    def table_keys(self):
+        return [
+            "Soaking Touch of Sargaras", "Unbound Chaos", "Shadow Blades", "Soaking Dark Marks", "Tornado damage", "Soaking Meteors"
+        ]
+
+    @property
+    def score_dict(self):
+        return {
+            "Soaking Touch of Sargaras": self.touch_of_sargeras_soak,
+            "Unbound Chaos": self.unbound_chaos,
+            "Shadow Blades": self.shadow_blades,
+            "Soaking Dark Marks": self.dark_marks,
+            "Tornado damage": self.tornados,
+            "Soaking Meteors": self.meteor_soak,
+        }
+
+
+class KiljaedenScore(RaidScore):
+    soaking_rain = models.IntegerField(default=0)
+    soaking_lasers = models.IntegerField(default=0)
+    obelisks = models.IntegerField(default=0)
+    bursting_dreadflame = models.IntegerField(default=0)
+
+    @property
+    def base_score(self):
+        return 0
+
+    @property
+    def table_keys(self):
+        return [
+            "Soaking Armageddon Rain", "Soaking Focused Dreadflame", "Obelisk Damage", "Bursting Dreadflame"
+        ]
+
+    @property
+    def score_dict(self):
+        return {
+            "Soaking Armageddon Rain": self.soaking_rain,
+            "Soaking Focused Dreadflame": self.soaking_lasers,
+            "Obelisk Damage": self.obelisks,
+            "Bursting Dreadflame": self.bursting_dreadflame
+        }

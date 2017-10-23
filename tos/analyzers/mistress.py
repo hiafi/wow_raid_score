@@ -246,10 +246,11 @@ class MistressAnalyzer(BossAnalyzer):
                                                 "target.name": ["Razorjaw Waverunner", "Abyss Stalker"]
                                             }, actors_obj_dict=self.actors):
             score_obj = self.score_objs.get(event.source)
-            if event.target.name == "Abyss Stalker":
-                score_obj.interrupts += 1 if score_obj.melee_dps else 2
-            if event.target.name == "Razorjaw Waverunner":
-                score_obj.interrupts += 2 if score_obj.melee_dps else 3
+            if score_obj:
+                if event.target.name == "Abyss Stalker":
+                    score_obj.interrupts += 1 if score_obj.melee_dps else 2
+                if event.target.name == "Razorjaw Waverunner":
+                    score_obj.interrupts += 2 if score_obj.melee_dps else 3
 
     def dispels(self):
         for event in self.client.get_events(self.wcl_fight,

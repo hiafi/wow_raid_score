@@ -86,5 +86,6 @@ class DIAnalyzer(BossAnalyzer):
                                                 "target.name": "Belac"
                                             }, actors_obj_dict=self.actors):
             score_obj = self.score_objs.get(event.source)
-            score_obj.interrupts += 1 if score_obj.melee_dps else 2
+            if score_obj:
+                score_obj.interrupts += 1 if score_obj.melee_dps else 2
 

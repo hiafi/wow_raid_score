@@ -5,6 +5,8 @@ from django.db import models
 from model_utils.managers import InheritanceManager
 from unidecode import unidecode
 from django.contrib.auth.models import User
+import datetime
+from django.utils import timezone
 
 
 class Player(models.Model):
@@ -28,6 +30,8 @@ class Boss(models.Model):
     zone_id = models.IntegerField()
     boss_id = models.IntegerField()
 
+    last_analyzer_update = models.DateField(default=timezone.now)
+
     def __str__(self):
         return "<Boss {}>".format(self.name)
 
@@ -47,6 +51,10 @@ class Raid(models.Model):
     user = models.ForeignKey(User)
     group = models.ForeignKey(Group, null=True, blank=True)
 
+    @property
+    def local_time(self):
+        return timezone.localtime(self.time)
+
     def __str__(self):
         return "<Raid {} - {}>".format(self.raid_id, self.time)
 
@@ -57,6 +65,7 @@ class Raid(models.Model):
 class Fight(models.Model):
     raid = models.ForeignKey(Raid)
     boss = models.ForeignKey(Boss)
+    date_parsed = models.DateField(default=timezone.now)
 
     fight_id = models.IntegerField()
     attempt = models.IntegerField()

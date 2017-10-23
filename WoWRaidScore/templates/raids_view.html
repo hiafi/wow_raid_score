@@ -1,8 +1,9 @@
 {% extends 'base_template.html' %}
+{% load tz %}
 {% block title %}Main Page{% endblock %}
 {% block content %}
     {% for raid in raids %}
-    <div><a href='{% url "view_raid" raid_id=raid.raid_id %}'>{{raid.time}} - {{ raid.raid_id }}</a></div>
+    <div><a href='{% url "view_raid" raid_id=raid.raid_id %}'>{{raid.time|localtime}} - {{ raid.raid_id }}</a></div>
     {% endfor %}
     <br />
     <div><a href='{% url "change_log" %}'> Change log</a></div>

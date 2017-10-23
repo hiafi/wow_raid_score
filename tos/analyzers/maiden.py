@@ -31,9 +31,6 @@ class MaidenAnalyzer(BossAnalyzer):
         self.didnt_jump_in_hole_people = {}
 
     def analyze(self):
-        solved_attempts = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25,
-                           26, 27, 28, 29, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46}
-        unsolved_attempts = {}
         print("Processing {}".format(self.wcl_fight))
         self.check_for_not_jumping_in_hole()
         self.wrong_orb()
@@ -147,7 +144,7 @@ class MaidenAnalyzer(BossAnalyzer):
                 similar_colors_far_away += 1
         if similar_colors_far_away > 2:
             print("{} ate an orb".format(player))
-            self.score_objs.get(player).bomb_from_p1_orb -= 10
+            self.score_objs.get(player).bomb_from_p1_orb -= 20
 
     def check_for_echos(self, player, timestamp):
         item_to_get = {
@@ -163,7 +160,7 @@ class MaidenAnalyzer(BossAnalyzer):
                                                 "type": WCLEventTypes.damage,
                                                 "ability.name": item_to_get.get(color)
                                             }, actors_obj_dict=self.actors):
-            self.score_objs.get(event.target).bomb_from_echos -= 10
+            self.score_objs.get(event.target).bomb_from_echos -= 20
             print("{} sat in echos".format(event.target))
             return True
         return False
@@ -182,7 +179,7 @@ class MaidenAnalyzer(BossAnalyzer):
             if color != other_color and distance < self.DISTANCE_TO_TRIGGER_BOMB:
                 close_by += 1
         if close_by >= 3:
-            self.score_objs.get(player).wrong_color -= 5 * len(related_people)
+            self.score_objs.get(player).wrong_color -= 10 * len(related_people)
             print("{} was in the wrong group".format(player))
             return True
         return False
@@ -198,14 +195,14 @@ class MaidenAnalyzer(BossAnalyzer):
             person2_movement = self.distance_calculation(status.get(person2).location, status_old.get(person2).location)
             if person1_movement > distance_to_move and person1_movement > person2_movement:
                 print("{} ran into {}".format(person1, person2))
-                self.score_objs.get(person1).wrong_color -= 10
+                self.score_objs.get(person1).wrong_color -= 20
             elif person2_movement > distance_to_move and person2_movement > person1_movement:
                 print("{} ran into {}".format(person2, person1))
-                self.score_objs.get(person2).wrong_color -= 10
+                self.score_objs.get(person2).wrong_color -= 20
             elif person2_movement > distance_to_move and person1_movement > distance_to_move:
                 print("They both fucked up")
-                self.score_objs.get(person1).wrong_color -= 5
-                self.score_objs.get(person2).wrong_color -= 5
+                self.score_objs.get(person1).wrong_color -= 10
+                self.score_objs.get(person2).wrong_color -= 10
 
     def check_for_running_into_wrong_color_group(self, timestamp, related_people):
         someone_was_in_wrong_group = False
@@ -218,7 +215,7 @@ class MaidenAnalyzer(BossAnalyzer):
                     all_different = False
             if all_different:
                 print("{} ran into the wrong group".format(person))
-                self.score_objs.get(person).wrong_color -= 5 * len(related_people)
+                self.score_objs.get(person).wrong_color -= 10 * len(related_people)
                 someone_was_in_wrong_group = True
         return someone_was_in_wrong_group
 
@@ -250,7 +247,7 @@ class MaidenAnalyzer(BossAnalyzer):
                     people_hit += 1
                 if people_hit >= 3 and not found_person:
                     print("{} Blew up".format(person))
-                    self.score_objs.get(person).didnt_jump_in_hole -= 20
+                    self.score_objs.get(person).didnt_jump_in_hole -= 50
                     found_person = True
                     self.didnt_jump_in_hole_people[person] = event.timestamp
 
@@ -336,9 +333,9 @@ class MaidenAnalyzer(BossAnalyzer):
             if valid:
                 print("Wrong Orb", player, timestamp)
                 score_obj = self.score_objs.get(player)
-                val = 20
+                val = 40
                 if score_obj.ranged_dps and self.wcl_fight.difficulty == self.MYTHIC_DIFFICULTY:
-                    val = 10
+                    val = 20
                 score_obj.wrong_orb -= val
 
     def right_orb(self):
@@ -355,7 +352,7 @@ class MaidenAnalyzer(BossAnalyzer):
                     if orb_distance[0] <= distance_from_center <= orb_distance[1]:
                         splashed = False
                 if splashed:
-                    self.score_objs.get(event.target).wrong_orb += 1
+                    self.score_objs.get(event.target).wrong_orb += 0
                 else:
                     self.score_objs.get(event.target).wrong_orb += 4
 

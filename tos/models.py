@@ -14,6 +14,10 @@ class GorothScore(RaidScore):
     not_hiding = models.IntegerField(default=0)
 
     @property
+    def base_score(self):
+        return 50
+
+    @property
     def table_keys(self):
         return [
             "Dropping Meteors on others", "Soaking Infernals", "Not hiding"
@@ -35,6 +39,10 @@ class DIScore(RaidScore):
     times_in_jail = models.IntegerField(default=0)
 
     @property
+    def base_score(self):
+        return 50
+
+    @property
     def table_keys(self):
         return [
             "Times in jail", "Explosive Anguish", "Going to jail in a group", "Interrupts"
@@ -53,6 +61,10 @@ class DIScore(RaidScore):
 class HarjatanScore(RaidScore):
     soaking_slams = models.IntegerField(default=0)
     stacks_of_debuff = models.IntegerField(default=0)
+
+    @property
+    def base_score(self):
+        return 20
 
     @property
     def table_keys(self):
@@ -76,7 +88,7 @@ class SistersScore(RaidScore):
 
     @property
     def base_score(self):
-        return 100
+        return 80
 
     @property
     def table_keys(self):
@@ -100,6 +112,10 @@ class HostScore(RaidScore):
     soulbinds = models.IntegerField(default=0)
     rupturing_slam = models.IntegerField(default=0)
     tormented_cries = models.IntegerField(default=0)
+
+    @property
+    def base_score(self):
+        return 80
 
     @property
     def table_keys(self):

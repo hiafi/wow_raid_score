@@ -73,7 +73,10 @@ class KiljaedenAnalyzer(BossAnalyzer):
             for event_to_check in people_affected.get(timestamp, []):
                 if event_to_check.target not in targeted:
                     for targeted_person in targeted:
-                        distance = self.distance_calculation(locations.get(event_to_check.target), locations.get(targeted_person))
-                        if distance < 1200:
-                            self.score_objs.get(targeted_person).bursting_dreadflame -= 2
+                        try:
+                            distance = self.distance_calculation(locations.get(event_to_check.target), locations.get(targeted_person))
+                            if distance < 1200:
+                                self.score_objs.get(targeted_person).bursting_dreadflame -= 2
+                        except TypeError:
+                            pass
 

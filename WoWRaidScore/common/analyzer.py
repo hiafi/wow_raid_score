@@ -28,7 +28,7 @@ class PlayerStatus(object):
 
 
 class SpecInfo(object):
-    DH_VENG = None
+    DH_VENG = 581
     DH_HAVOC = None
     DK_BLOOD = 250
     DK_FROST = 251
@@ -46,7 +46,7 @@ class SpecInfo(object):
     MONK_MW = 270
     MONK_BM = 268
     MONK_WW = 269
-    PALADIN_HOLY = None
+    PALADIN_HOLY = 65
     PALADIN_RET = None
     PALADIN_PROT = None
     PRIEST_HOLY = 257

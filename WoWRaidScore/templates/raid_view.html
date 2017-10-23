@@ -4,13 +4,13 @@
     <table class="score_table">
         <tr>
             {% for boss in avg_scores.0 %}
-                <th>{{boss}}</th>
+                <th>{{boss.name}}</th>
             {% endfor %}
         </tr>
         {% for row in avg_scores|slice:"1:" %}
         <tr>
             {% for col in row %}
-                <td><a href='{% url "view_raid_player_details" raid_id=raid.raid_id player_id=col.1.id boss_id=col.2.boss_id %}'>{{col.1.safe_name}} {{col.0|floatformat}}</a></td>
+                <td><a href='{% url "view_raid_player_details" raid_id=raid.raid_id player_id=col.1.id boss_id=col.2.boss_id %}'><b>{{col.1.safe_name}}</b> <em>{{col.0|floatformat}}</em></a></td>
             {% endfor %}
         </tr>
         {% endfor %}
@@ -19,7 +19,7 @@
 
     {% for boss, score_list in final_totals.items %}
     <div >
-        <div style="text-align: center;"><b>{{boss}}</b></div>
+        <div style="text-align: center;"><b>{{boss.name}}</b></div>
         <table class="score_table" style='margin: 0px auto;'>
             {% for row in score_list %}
             <tr>

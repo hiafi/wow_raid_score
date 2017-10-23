@@ -41,8 +41,8 @@ def _get_avg_scores(score_objs):
 def _sort_avg_scores(avg_scores):
     new_scores = {}
     for boss, score_dict in avg_scores.items():
-        new_scores[boss] = sorted([(score, player, boss) for player, score in score_dict.items()], reverse=True, key=lambda x: x[0])
-    boss_order = new_scores.keys()
+        new_scores[boss] = sorted(sorted([(score, player, boss) for player, score in score_dict.items()], reverse=False, key=lambda x: x[1].name), key=lambda x: x[0], reverse=True)
+    boss_order = sorted(new_scores.keys(), key=lambda boss: boss.ordering)
     transposed_table = [[b for b in boss_order]]
     for index in range(max([len(new_scores[b]) for b in boss_order])):
         transposed_table.append([])
@@ -80,8 +80,9 @@ def view_raid(request, raid_id):
     avg_scores = _get_avg_scores(score_objs)
     sorted_scores = _sort_avg_scores(avg_scores)
     final_totals = _get_totals(score_objs)
+    bosses = sorted(list({score_obj.fight.boss for score_obj in score_objs}), key=lambda boss: boss.ordering)
 
-    return render(request, "raid_view.html", {"players": players, "score_objs": score_objs,
+    return render(request, "raid_view.html", {"players": players, "score_objs": score_objs, "boss_order": bosses,
                                               "avg_scores": sorted_scores, "final_totals": final_totals, "raid": raid})
 
 

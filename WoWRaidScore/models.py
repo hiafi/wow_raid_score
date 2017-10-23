@@ -31,9 +31,13 @@ class Boss(models.Model):
     boss_id = models.IntegerField()
 
     last_analyzer_update = models.DateField(default=timezone.now)
+    ordering = models.IntegerField(default=0)
+
+    class Meta:
+        ordering = ['zone_id', 'ordering']
 
     def __str__(self):
-        return "<Boss {}>".format(self.name)
+        return "<Boss {} ({}) Valid Date: {}>".format(self.name, self.ordering, self.last_analyzer_update)
 
     def __repr__(self):
         return self.__str__()

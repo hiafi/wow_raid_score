@@ -1,7 +1,7 @@
 {% extends 'base_template.html' %}
 {% block title %}Raid {{raid.raid_id}}{% endblock %}
 {% block content %}
-    <table class="score_table">
+    <table class="score_table" style='margin: 0px auto;'>
         <tr>
             {% for boss in avg_scores.0 %}
                 <th>{{boss.name}}</th>

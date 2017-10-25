@@ -40,7 +40,7 @@ class SpecInfo(object):
     HUNTER_BM = 253
     HUNTER_MM = 254
     HUNTER_SV = None
-    MAGE_ARCANE = None
+    MAGE_ARCANE = 62
     MAGE_FIRE = 63
     MAGE_FROST = 64
     MONK_MW = 270
@@ -189,6 +189,7 @@ class BossAnalyzer(object):
             267,  # destruction lock
             SpecInfo.MAGE_FROST,
             SpecInfo.MAGE_FIRE,
+            SpecInfo.MAGE_ARCANE,
             262,  # Ele shaman
             SpecInfo.WARLOCK_DEMO,
         }
@@ -241,7 +242,7 @@ class BossAnalyzer(object):
             number_of_deaths = int(len(self.score_objs) * 0.30)
         death_order = self.get_player_death_order()
         death_time = None
-        if len(death_order) >= number_of_deaths:
+        if len(death_order) > number_of_deaths:
             death_time = self.get_player_death_times().get(death_order[number_of_deaths])
         return death_time
 

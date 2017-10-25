@@ -38,21 +38,6 @@ def _get_avg_scores(score_objs):
     return avg_scores
 
 
-def _sort_avg_scores(avg_scores):
-    new_scores = {}
-    for boss, score_dict in avg_scores.items():
-        new_scores[boss] = sorted(sorted([(score, player, boss) for player, score in score_dict.items()], reverse=False, key=lambda x: x[1].name), key=lambda x: x[0], reverse=True)
-    boss_order = sorted(new_scores.keys(), key=lambda boss: boss.ordering)
-    transposed_table = [[b for b in boss_order]]
-    for index in range(max([len(new_scores[b]) for b in boss_order])):
-        transposed_table.append([])
-        for boss in boss_order:
-            if len(new_scores[boss]) > index:
-                transposed_table[-1].append(new_scores[boss][index])
-    
-    return transposed_table
-
-
 def _get_totals(score_objs):
     totals = defaultdict(lambda: defaultdict(int))
     keys_dict = {}
@@ -62,15 +47,10 @@ def _get_totals(score_objs):
             if score_obj.fight.boss not in keys_dict:
                 keys_dict[score_obj.fight.boss] = score_obj.table_keys
             totals[score_obj.fight.boss][name] += val
-    for boss, fight_scores_dict in totals.items():
-        keys = keys_dict.get(boss)
-        final_totals[boss].append(keys)
-        ft = []
-        for key in keys:
-            ft.append(fight_scores_dict.get(key))
-        final_totals[boss].append(ft)
-    final_totals = sorted([(boss, total) for boss, total in final_totals.items()], key=lambda x: x[0].ordering)
-    return final_totals
+    for boss, score_dict in totals.items():
+        for key in keys_dict.get(boss):
+            final_totals[boss].append((key, totals[boss][key]))
+    return dict(final_totals)
 
 
 def view_raid(request, raid_id):
@@ -79,7 +59,10 @@ def view_raid(request, raid_id):
     score_objs = RaidScore.objects.filter(fight__in=fights).select_subclasses()
     players = {score_obj.player for score_obj in score_objs}
     avg_scores = _get_avg_scores(score_objs)
-    sorted_scores = _sort_avg_scores(avg_scores)
+    sorted_scores = defaultdict(list)
+    for boss, score_dict in avg_scores.items():
+        sorted_scores[boss] = sorted(sorted([(score, player, boss) for player, score in score_dict.items()], reverse=False, key=lambda x: x[1].name), key=lambda x: x[0], reverse=True)
+
     final_totals = _get_totals(score_objs)
     bosses = sorted(list({score_obj.fight.boss for score_obj in score_objs}), key=lambda boss: boss.ordering)
 

@@ -9,3 +9,8 @@
     width:auto !important;
     text-align: center;
 }
+
+.boss_view_text_rankings {
+    min-width: 400px;
+    text-align: center;
+}

@@ -1,36 +1,50 @@
 {% extends 'base_template.html' %}
+{% load dict_lookup %}
 {% block title %}Raid {{raid.raid_id}}{% endblock %}
 {% block content %}
-    <table class="score_table" style='margin: 0px auto;'>
-        <tr>
-            {% for boss in avg_scores.0 %}
-                <th>{{boss.name}}</th>
-            {% endfor %}
-        </tr>
-        {% for row in avg_scores|slice:"1:" %}
-        <tr>
-            {% for col in row %}
-                <td><a href='{% url "view_raid_player_details" raid_id=raid.raid_id player_id=col.1.id boss_id=col.2.boss_id %}'><b>{{col.1.safe_name}}</b> <em>{{col.0|floatformat}}</em></a></td>
-            {% endfor %}
-        </tr>
-        {% endfor %}
-    </table>
-    <br />
 
-    {% for boss, score_list in final_totals %}
+    {% for boss, score_list in final_totals.items %}
     <div >
         <div style="text-align: center;"><b>{{boss.name}}</b></div>
-        <table class="score_table" style='margin: 0px auto;'>
-            {% for row in score_list %}
-            <tr>
-                {% for val in row %}
-                <td> {{ val }} </td>
+        <table style='margin: 0px auto;'>
+        <tr>
+            <td class="boss_view_text_rankings">
+                {% for player_score in avg_scores|get_item:boss %}
+                <div><a href='{% url "view_raid_player_details" raid_id=raid.raid_id player_id=player_score.1.id boss_id=player_score.2.boss_id %}'><b>{{player_score.1.safe_name}}</b> <em>{{player_score.0|floatformat}}</em></a></div>
                 {% endfor %}
-            </tr>
-            {% endfor %}
+            </td>
+            <td>
+                <canvas id="{{ boss.id }}_graph" width="800" height="400"></canvas>
+            </td>
+
+        </tr>
         </table>
-        <br />
     </div>
+        <br />
     {% endfor %}
+
+<script>
+{% for boss, score_list in final_totals.items %}
+var ctx = document.getElementById("{{ boss.id }}_graph").getContext('2d');
+console.log(ctx);
+var myChart = new Chart(ctx, {
+    type: 'bar',
+    data: {
+        datasets: [
+            {% for label, value in score_list %}
+            {
+                data: [{{ value }}],
+                label: "{{label}}",
+                backgroundColor: {% if value >= 0 %}"#c0ffa3"{% else %}"#ffa6a3"{% endif %}
+            },
+            {% endfor %}
+        ]
+    },
+    options: {
+        responsive: true
+    }
+});
+{% endfor %}
+</script>
 
 {% endblock %}

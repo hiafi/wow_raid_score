@@ -3,7 +3,7 @@
 {% block title %}Raid {{raid.raid_id}}{% endblock %}
 {% block content %}
 
-    {% for boss, score_list in final_totals.items %}
+    {% for boss in boss_order %}
     <div >
         <div style="text-align: center;"><b>{{boss.name}}</b></div>
         <table style='margin: 0px auto;'>

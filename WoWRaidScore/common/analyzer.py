@@ -1,6 +1,7 @@
-from WoWRaidScore.models import RaidScore
+from WoWRaidScore.models import RaidScore, FightEvent
 from WoWRaidScore.wcl_utils.wcl_data_objs import WCLEventTypes
 from collections import defaultdict
+from WoWRaidScore.wcl_utils.wcl_util_functions import get_readable_time
 
 import math
 
@@ -64,6 +65,47 @@ class SpecInfo(object):
     WARRIOR_ARMS = 72
     WARRIOR_FURY = None
 
+    melee_dps_specs = {
+        259,
+        70,
+        71,
+        577,
+        SHAMAN_ENH,  # Enh Shaman
+        MONK_WW,  # WW monk
+        WARRIOR_ARMS,  # Arms war
+        DK_FROST,  # Frost DK
+        ROGUE_SUB,  # sub rogue
+    }
+    ranged_dps_specs = {
+        258,  #
+        102,  # balance druid
+        HUNTER_BM,
+        HUNTER_MM,
+        265,  # affliction lock
+        267,  # destruction lock
+        MAGE_FROST,
+        MAGE_FIRE,
+        MAGE_ARCANE,
+        262,  # Ele shaman
+        WARLOCK_DEMO,
+    }
+    healer_specs = {
+        DRUID_RESTO,
+        MONK_MW,
+        SHAMAN_RESTO,
+        PALADIN_HOLY,
+        PRIEST_HOLY,
+        PRIEST_DISC,
+    }
+    tank_specs = {
+        MONK_BM,
+        DRUID_GUARDIAN,
+        DK_BLOOD,
+        WARRIOR_PROT,
+        PALADIN_PROT,
+        DH_VENG,
+    }
+
 
 class BossAnalyzer(object):
     DEBUG = False
@@ -78,11 +120,12 @@ class BossAnalyzer(object):
         if self.DEBUG:
             print(message)
 
-    def __init__(self, wcl_fight, wcl_client, score_objs, actors):
+    def __init__(self, wcl_fight, wcl_client, score_objs, actors, fight_obj):
         self.wcl_fight = wcl_fight
         self.client = wcl_client
         self.score_objs = score_objs
         self.actors = actors
+        self.fight_obj = fight_obj
 
         self._cached_deaths = {}
         self._cached_status = defaultdict(dict)
@@ -169,53 +212,14 @@ class BossAnalyzer(object):
 
     @classmethod
     def create_raid_score_obj(cls, player, fight, spec):
-        melee_dps_specs = {
-            259,
-            70,
-            71,
-            577,
-            SpecInfo.SHAMAN_ENH,  # Enh Shaman
-            SpecInfo.MONK_WW,  # WW monk
-            SpecInfo.WARRIOR_ARMS,  # Arms war
-            SpecInfo.DK_FROST,  # Frost DK
-            SpecInfo.ROGUE_SUB,  # sub rogue
-        }
-        ranged_dps_specs = {
-            258,  #
-            102,  # balance druid
-            SpecInfo.HUNTER_BM,
-            SpecInfo.HUNTER_MM,
-            265,  # affliction lock
-            267,  # destruction lock
-            SpecInfo.MAGE_FROST,
-            SpecInfo.MAGE_FIRE,
-            SpecInfo.MAGE_ARCANE,
-            262,  # Ele shaman
-            SpecInfo.WARLOCK_DEMO,
-        }
-        healer_specs = {
-            SpecInfo.DRUID_RESTO,
-            SpecInfo.MONK_MW,
-            SpecInfo.SHAMAN_RESTO,
-            SpecInfo.PALADIN_HOLY,
-            SpecInfo.PRIEST_HOLY,
-            SpecInfo.PRIEST_DISC,
-        }
-        tank_specs = {
-            SpecInfo.MONK_BM,  # BM monk
-            SpecInfo.DRUID_GUARDIAN,  # druid
-            SpecInfo.DK_BLOOD,  # blood dk
-            SpecInfo.WARRIOR_PROT,  # blood dk
-            SpecInfo.PALADIN_PROT,  # blood dk
-            SpecInfo.DH_VENG,  # blood dk
-        }
-        if spec not in melee_dps_specs and spec not in ranged_dps_specs and spec not in healer_specs and spec not in tank_specs:
+
+        if spec not in SpecInfo.melee_dps_specs and spec not in SpecInfo.ranged_dps_specs and spec not in SpecInfo.healer_specs and spec not in SpecInfo.tank_specs:
             print("Unable to find spec {} ({})".format(spec, player.safe_name))
         return cls.SCORE_OBJ(player=player, fight=fight, spec=spec,
-                             melee_dps=spec in melee_dps_specs,
-                             ranged_dps=spec in ranged_dps_specs,
-                             tank=spec in tank_specs,
-                             healer=spec in healer_specs)
+                             melee_dps=spec in SpecInfo.melee_dps_specs,
+                             ranged_dps=spec in SpecInfo.ranged_dps_specs,
+                             tank=spec in SpecInfo.tank_specs,
+                             healer=spec in SpecInfo.healer_specs)
 
     def get_player_death_times(self):
         if self._cached_deaths != {}:
@@ -228,6 +232,11 @@ class BossAnalyzer(object):
                 deaths[event.target] = event.timestamp
         self._cached_deaths = deaths
         return deaths
+
+    def create_score_event(self, timestamp, text, player=None):
+        minute, second = get_readable_time(timestamp, self.wcl_fight.start_time_str)
+        fe = FightEvent(fight=self.fight_obj, player=player, minute=minute, second=second, text=text)
+        fe.save()
 
     def get_player_death_order(self):
         deaths = self.get_player_death_times()

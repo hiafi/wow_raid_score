@@ -38,8 +38,19 @@
         </tr>
     </table>
 
+<button type="button" class="btn btn-info" data-toggle="collapse" data-target="#score_chart_div">Score Chart</button>
+<div id="score_chart_div" class="collapse">
+    <canvas id="score_chart" width="400" height="200"></canvas>
+</div>
+<br /> <br />
 
-<canvas id="myChart" width="400" height="200"></canvas>
+<div><button type="button" class="btn btn-info" data-toggle="collapse" data-target="#events">Events</button></div>
+    <div id="events" class="collapse">
+    {% for event in events %}
+        <div>Attempt {{ event.fight.attempt }} ({{ event.minute }}:{{ event.second_string }}): {{ event.text }}</div>
+    {% endfor %}
+    </div>
+
 <script>
 var scores = {{totals}};
 var health = {{health}};
@@ -48,7 +59,7 @@ var labels = [];
 for (var i = 0; i < n; i++) {
   labels.push(i+1);
 }
-var ctx = document.getElementById("myChart").getContext('2d');
+var ctx = document.getElementById("score_chart").getContext('2d');
 var myChart = new Chart(ctx, {
     type: 'line',
     data: {

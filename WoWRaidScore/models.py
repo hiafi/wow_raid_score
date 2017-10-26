@@ -108,3 +108,15 @@ class RaidScore(models.Model):
     @property
     def total(self):
         return self.base_score + sum(self.score_dict.values())
+
+
+class FightEvent(models.Model):
+    fight = models.ForeignKey(Fight)
+    player = models.ForeignKey(Player, null=True, blank=True)
+    minute = models.IntegerField()
+    second = models.IntegerField()
+    text = models.TextField()
+
+    @property
+    def second_string(self):
+        return "{:02d}".format(self.second)

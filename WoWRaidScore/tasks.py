@@ -4,7 +4,7 @@ from django.core.exceptions import ObjectDoesNotExist
 from django.contrib.auth.models import User
 
 from WoWRaidScore.common.analyzer_builder import build_analyzers
-from WoWRaidScore.models import Raid, Fight, RaidScore, Group
+from WoWRaidScore.models import Raid, Fight, RaidScore, Group, FightEvent
 
 
 @shared_task()
@@ -39,7 +39,10 @@ def _get_raid_obj(wcl_client, raid_id, user_id, group_id, delete_fights, overwri
                 for fight in Fight.objects.filter(raid=raid):
                     for raid_score in RaidScore.objects.filter(fight=fight):
                         raid_score.delete()
+                    for event in FightEvent.objects.filter(fight=fight):
+                        event.delete()
                     fight.delete()
+
             else:
                 raise Exception("The raid has already been parsed")
     except ObjectDoesNotExist:

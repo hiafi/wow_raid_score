@@ -9,8 +9,8 @@ class MistressAnalyzer(BossAnalyzer):
     SCORE_OBJ = MistressScore
     STOP_AT_DEATH = 5
 
-    def __init__(self, wcl_fight, wcl_client, score_objs, actors):
-        super(MistressAnalyzer, self).__init__(wcl_fight, wcl_client, score_objs, actors)
+    def __init__(self, *args):
+        super(MistressAnalyzer, self).__init__(*args)
         self.stuns = defaultdict(list)
 
     def analyze(self):
@@ -90,9 +90,11 @@ class MistressAnalyzer(BossAnalyzer):
                 for shock_time in shock_times:
                     if start_time < shock_time < (end_time - 5000):
                         missed_shocks[event.target] += 1
+                        self.create_score_event(shock_time, "had a murloc but didn't get stunned", player=event.target)
         for target, count in missed_shocks.items():
             score_obj = self.score_objs.get(target)
             score_obj.murlock_debuff_uptime = count * -5
+
 
     def shadow_dropoffs(self):
         debuff_dict = {}
@@ -139,6 +141,8 @@ class MistressAnalyzer(BossAnalyzer):
                                                 "ability.id": "234332"
                                             }, actors_obj_dict=self.actors):
             self.stuns[event.target].append((event.timestamp, event.timestamp + 20000))
+            self.create_score_event(event.timestamp, "was stunned by a hydra shot",
+                                    player=event.target)
         return self.stuns
 
     def hydra_shots(self):
@@ -151,13 +155,15 @@ class MistressAnalyzer(BossAnalyzer):
         player_status = {}
         for event in self.client.get_events(self.wcl_fight,
                                             filters={
-                                                "type": [WCLEventTypes.apply_debuff],
-                                                "ability.name": "Hydra Acid"
+                                                "type": WCLEventTypes.damage,
+                                                "ability.id": 230143
                                             }, actors_obj_dict=self.actors):
             if event.timestamp - recent_timestamp > 3000:
                 for player in players_to_check:
                     missed_soaks[player] += 1
                     cached_health = False
+                    self.create_score_event(event.timestamp, "missed a hydra shot",
+                                            player=player)
                 if not cached_health:
                     cached_health = True
                     player_status = self.get_all_player_status_at_time(event.timestamp)
@@ -224,6 +230,8 @@ class MistressAnalyzer(BossAnalyzer):
                 if not self.between_multiple_durations(timestamp, existing_timestamps):
                     score_obj = self.score_objs.get(player)
                     score_obj.tornado_damage -= 30
+                    self.create_score_event(timestamp, "was hit by a tornado",
+                                            player=player)
 
     def stupid_damage(self):
         for event in self.client.get_events(self.wcl_fight,
@@ -238,6 +246,8 @@ class MistressAnalyzer(BossAnalyzer):
                     score_obj.hit_by_giant_fish -= 10
                 else:
                     score_obj.hit_by_giant_fish -= 40
+                self.create_score_event(event.timestamp, "was hit by crashing wave",
+                                        player=event.target)
 
     def interrupts(self):
         for event in self.client.get_events(self.wcl_fight,

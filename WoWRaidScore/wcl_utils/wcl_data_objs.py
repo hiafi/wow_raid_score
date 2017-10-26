@@ -1,4 +1,4 @@
-from WoWRaidScore.wcl_utils.wcl_util_functions import convert_timestamp
+from WoWRaidScore.wcl_utils.wcl_util_functions import convert_timestamp, get_readable_time
 from unidecode import unidecode
 
 
@@ -54,6 +54,10 @@ class WCLFight(object):
 
     def add_enemy(self, enemy):
         self.enemies[enemy.id] = enemy
+
+    def get_readable_time(self, timestamp):
+        time_dur = (timestamp - self.start_time_str) / 1000
+        return (int(time_dur / 60), time_dur % 60)
 
     def __str__(self):
         return "<WCLFight {} ({}) - {} ({}%)>".format(self.name, self.boss_id, self.attempt, self.percent)
@@ -165,8 +169,8 @@ class WCLTargetEvent(object):
 
     @property
     def readable_timestamp(self):
-        secs = (self.timestamp - self.start_of_fight)/1000
-        return "{}:{:02d}".format(int(secs / 60), int(secs % 60))
+        minute, second = get_readable_time(self.timestamp, self.start_of_fight)
+        return "{}:{:02d}".format(minute, second)
 
     def __str__(self):
         return "<Event {}: {}->{} {}>".format(self.type, self.safe_source, self.safe_target,

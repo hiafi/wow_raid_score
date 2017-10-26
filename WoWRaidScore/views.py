@@ -12,7 +12,7 @@ from django.shortcuts import render
 import json
 import logging
 
-from WoWRaidScore.models import Raid, Fight, RaidScore, Player, Boss
+from WoWRaidScore.models import Raid, Fight, RaidScore, Player, Boss, FightEvent
 from WoWRaidScore.tasks import parse_task, parse_raid_task, update_raid_to_current, update_raid_task
 from WoWRaidScore.wcl_utils.wclogs_requests import WCLRequests
 
@@ -91,9 +91,10 @@ def view_player_details_for_raid(request, raid_id, player_id, boss_id):
     total_list = [score.total for score in score_objs]
     health_list = [score.fight.percent for score in score_objs]
     totals = _get_totals_for_player(score_objs)
+    events = FightEvent.objects.filter(fight__in=fights, player=player)
 
     context = {"player": player, "score_objs": score_objs, "totals": total_list, "base_score_total": sum([score.base_score for score in score_objs]),
-               "health": health_list, "total_dict": totals}
+               "health": health_list, "total_dict": totals, "events":events}
     return render(request, "player_raid_view.html", context)
 
 

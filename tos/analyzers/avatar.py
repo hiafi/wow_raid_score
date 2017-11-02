@@ -7,12 +7,13 @@ from collections import defaultdict
 
 class AvatarAnalyzer(BossAnalyzer):
     SCORE_OBJ = AvatarScore
+    STOP_AT_DEATH = 3
 
     def analyze(self):
         print("Analyzing {}".format(self.wcl_fight))
-        self.tornado_damage()
         self.unbound_chaos()
         if self.wcl_fight.difficulty < self.MYTHIC_DIFFICULTY:
+            self.tornado_damage()
             self.soaking_touches()
         self.soaking_dark_marks()
         self.soaking_p2_meteors()
@@ -26,6 +27,8 @@ class AvatarAnalyzer(BossAnalyzer):
                                                 "type": [WCLEventTypes.apply_debuff, WCLEventTypes.apply_debuff_stack],
                                                 "ability.name": "Black Winds"
                                             }, actors_obj_dict=self.actors):
+            if self.check_for_wipe(event, death_count=self.STOP_AT_DEATH):
+                return
             self.score_objs.get(event.target).tornados -= 10
 
     def unbound_chaos(self):
@@ -34,6 +37,8 @@ class AvatarAnalyzer(BossAnalyzer):
                                                 "type": WCLEventTypes.damage,
                                                 "ability.name": "Unbound Chaos"
                                             }, actors_obj_dict=self.actors):
+            if self.check_for_wipe(event, death_count=self.STOP_AT_DEATH):
+                return
             score_obj = self.score_objs.get(event.target)
             if score_obj.tank:
                 score_obj.unbound_chaos -= 4
@@ -46,6 +51,8 @@ class AvatarAnalyzer(BossAnalyzer):
                                                 "type": WCLEventTypes.damage,
                                                 "ability.name": "Touch of Sargeras"
                                             }, actors_obj_dict=self.actors):
+            if self.check_for_wipe(event, death_count=self.STOP_AT_DEATH):
+                return
             score_obj = self.score_objs.get(event.target)
             val = 5
             if score_obj.tank:
@@ -59,6 +66,8 @@ class AvatarAnalyzer(BossAnalyzer):
                                                 "type": WCLEventTypes.damage,
                                                 "ability.name": "Dark Mark"
                                             }, actors_obj_dict=self.actors):
+            if self.check_for_wipe(event, death_count=self.STOP_AT_DEATH):
+                return
             score_obj = self.score_objs.get(event.target)
             val = 5
             if score_obj.tank:

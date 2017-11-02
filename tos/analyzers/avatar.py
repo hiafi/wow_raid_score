@@ -30,6 +30,7 @@ class AvatarAnalyzer(BossAnalyzer):
             if self.check_for_wipe(event, death_count=self.STOP_AT_DEATH):
                 return
             self.score_objs.get(event.target).tornados -= 10
+            self.create_score_event(event.timestamp, "{} was hit by a tornado".format(event.target.safe_name), event.target)
 
     def unbound_chaos(self):
         for event in self.client.get_events(self.wcl_fight,
@@ -39,11 +40,14 @@ class AvatarAnalyzer(BossAnalyzer):
                                             }, actors_obj_dict=self.actors):
             if self.check_for_wipe(event, death_count=self.STOP_AT_DEATH):
                 return
-            score_obj = self.score_objs.get(event.target)
+            score_obj = self.score_objs.get(event.source)
             if score_obj.tank:
                 score_obj.unbound_chaos -= 4
+            elif event.source != event.target:
+                score_obj.unbound_chaos -= 1
             else:
                 score_obj.unbound_chaos -= 2
+            self.create_score_event(event.timestamp, "{} hit {} with unbound chaos".format(event.source.safe_name, event.target.safe_name), event.source)
 
     def soaking_touches(self):
         for event in self.client.get_events(self.wcl_fight,

@@ -12,7 +12,8 @@ class AvatarAnalyzer(BossAnalyzer):
         print("Analyzing {}".format(self.wcl_fight))
         self.tornado_damage()
         self.unbound_chaos()
-        self.soaking_touches()
+        if self.wcl_fight.difficulty < self.MYTHIC_DIFFICULTY:
+            self.soaking_touches()
         self.soaking_dark_marks()
         self.soaking_p2_meteors()
         self.shadow_blades()

@@ -129,10 +129,12 @@ class BossAnalyzer(object):
 
         self._cached_deaths = {}
         self._cached_status = defaultdict(dict)
+        self._cached_defensives = defaultdict(list)
 
     def cleanup(self):
         self._cached_deaths = {}
         self._cached_status = {}
+        self._cached_defensives = {}
 
     @staticmethod
     def distance_calculation(coord1, coord2):
@@ -220,6 +222,34 @@ class BossAnalyzer(object):
                              ranged_dps=spec in SpecInfo.ranged_dps_specs,
                              tank=spec in SpecInfo.tank_specs,
                              healer=spec in SpecInfo.healer_specs)
+
+    def get_big_defensives(self):
+        if self._cached_defensives:
+            return self._cached_defensives
+        temp = {}
+        for event in self.client.get_events(self.wcl_fight,
+                                            filters={"type": [WCLEventTypes.apply_buff, WCLEventTypes.remove_buff],
+                                                "ability.name": ["Metamorphosis", "Dispersion"]
+                                                 },
+                                            actors_obj_dict=self.actors):
+            if event.type == WCLEventTypes.apply_buff:
+                temp[event.target] = event.timestamp
+            else:
+                if event.target in temp:
+                    self._cached_defensives[event.target].append((temp[event.target], event.timestamp))
+                    del temp[event.target]
+                elif event.timestamp - self.wcl_fight.start_time_str <= 30000:
+                    self._cached_defensives[event.target].append((self.wcl_fight.start_time_str, event.timestamp))
+        for person, timestamp in temp.items():
+            self._cached_defensives[person].append((timestamp, self.wcl_fight.end_time_str))
+        return self._cached_defensives
+
+    def check_for_a_defensive_used(self, event, target):
+        defensives = self.get_big_defensives().get(target, [])
+        for (defensive_start, defensive_end) in defensives:
+            if self.between_duration(defensive_start, event.timestamp, defensive_end):
+                return True
+        return False
 
     def get_player_death_times(self):
         if self._cached_deaths != {}:

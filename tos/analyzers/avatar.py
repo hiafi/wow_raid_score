@@ -40,6 +40,8 @@ class AvatarAnalyzer(BossAnalyzer):
                                             }, actors_obj_dict=self.actors):
             if self.check_for_wipe(event, death_count=self.STOP_AT_DEATH):
                 return
+            if self.check_for_a_defensive_used(event, event.target):
+                continue
             score_obj = self.score_objs.get(event.source)
             if score_obj.tank:
                 score_obj.unbound_chaos -= 4

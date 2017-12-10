@@ -104,13 +104,22 @@ class WCLRequests(object):
         url = url.replace(" ", "%20")
         url = url.replace("\"", "%22")
         url = url.replace("=", "%3D")
+        url = url.replace("<", "%3C")
+        url = url.replace(">", "%3E")
+        url = url.replace("'", "%27")
         return url
+
+    @staticmethod
+    def build_single_filter_param(filter_name, filter_value):
+        if isinstance(filter_value, tuple):
+            return "{}{}\"{}\"".format(filter_name, filter_value[0], filter_value[1])
+        return "{}=\"{}\"".format(filter_name, filter_value)
 
     @staticmethod
     def build_filter_param(filter_name, filter_value):
         if isinstance(filter_value, list):
-            return "({})".format(" OR ".join(["{}=\"{}\"".format(filter_name, val) for val in filter_value]))
-        return "{}=\"{}\"".format(filter_name, filter_value)
+            return "({})".format(" OR ".join([WCLRequests.build_single_filter_param(filter_name, val) for val in filter_value]))
+        return WCLRequests.build_single_filter_param(filter_name, filter_value)
 
 
     @staticmethod

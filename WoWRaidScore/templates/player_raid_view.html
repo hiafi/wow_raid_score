@@ -11,7 +11,7 @@
             <th>Total</th>
             {% if score_objs.0.base_score %} <th>Base Score</th> {% endif %}
             {% for header in score_objs.0.table_keys %}
-                <th>{{header}}</th>
+                <th><a href="#" title="{{ score_tooltips|get_item:header }}">{{header}}</a></th>
             {% endfor %}
         </tr>
 
@@ -89,7 +89,10 @@ var myChart = new Chart(ctx, {
             intersect: true
         }
     }
+});
 
+$( function() {
+    $( document ).tooltip();
 });
 </script>
 

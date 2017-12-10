@@ -109,6 +109,10 @@ class RaidScore(models.Model):
     def total(self):
         return self.base_score + sum(self.score_dict.values())
 
+    @property
+    def score_description(self):
+        return {}
+
 
 class FightEvent(models.Model):
     fight = models.ForeignKey(Fight)

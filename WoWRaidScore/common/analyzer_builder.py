@@ -1,10 +1,12 @@
 from django.core.exceptions import ObjectDoesNotExist
 from tos.analyzer_builder import tos_fights
+from antorus.analyzer_builder import antorus_fights
 from WoWRaidScore.models import Player, Fight, Boss
 from WoWRaidScore.wcl_utils.wcl_data_objs import WCLEventTypes
 
 raid_id_to_fight_dict = {
-    13: tos_fights
+    13: tos_fights,
+    17: antorus_fights
 }
 
 
@@ -51,7 +53,8 @@ def build_analyzers(wcl_fights, raid_obj, wcl_client):
     player_objs = _get_player_objs_dict(wcl_fights)
     for wcl_fight in wcl_fights.values():
         raid = raid_id_to_fight_dict.get(wcl_fight.zone_id)
-        if not raid:
+        if raid is None:
+            print("No raid {} found".format(wcl_fight.zone_id))
             continue
         analyzer = raid.get(wcl_fight.boss_id)
         if analyzer:
@@ -61,4 +64,6 @@ def build_analyzers(wcl_fights, raid_obj, wcl_client):
             score_objs = analyzer.create_raid_scores(players.values(), fight, specs)
             players.update(wcl_fight.enemies)
             analyzers.append(analyzer(wcl_fight, wcl_client, score_objs, players, fight))
+        else:
+            print("No fight {} found".format(wcl_fight.boss_id))
     return analyzers

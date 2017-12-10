@@ -94,7 +94,7 @@ def view_player_details_for_raid(request, raid_id, player_id, boss_id):
     events = FightEvent.objects.filter(fight__in=fights, player=player)
 
     context = {"player": player, "score_objs": score_objs, "totals": total_list, "base_score_total": sum([score.base_score for score in score_objs]),
-               "health": health_list, "total_dict": totals, "events":events}
+               "health": health_list, "total_dict": totals, "events": events, "score_tooltips": score_objs[0].score_description}
     return render(request, "player_raid_view.html", context)
 
 

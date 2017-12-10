@@ -33,7 +33,7 @@ class SpecInfo(object):
     DH_HAVOC = None
     DK_BLOOD = 250
     DK_FROST = 251
-    DK_UNHOLY = None
+    DK_UNHOLY = 252
     DRUID_GUARDIAN = 104
     DRUID_BALANCE = 102
     DRUID_FERAL = None
@@ -56,10 +56,10 @@ class SpecInfo(object):
     ROGUE_SUB = 261
     ROGUE_ASS = None
     SHAMAN_RESTO = 264
-    SHAMAN_ELE = None
+    SHAMAN_ELE = 262
     SHAMAN_ENH = 263
-    WARLOCK_AFF = None
-    WARLOCK_DESTR = None
+    WARLOCK_AFF = 265
+    WARLOCK_DESTR = 267
     WARLOCK_DEMO = 266
     WARRIOR_PROT = None
     WARRIOR_ARMS = 72
@@ -74,20 +74,21 @@ class SpecInfo(object):
         MONK_WW,  # WW monk
         WARRIOR_ARMS,  # Arms war
         DK_FROST,  # Frost DK
+        DK_UNHOLY,
         ROGUE_SUB,  # sub rogue
     }
     ranged_dps_specs = {
-        258,  #
-        102,  # balance druid
+        PRIEST_SHADOW,
+        DRUID_BALANCE,
         HUNTER_BM,
         HUNTER_MM,
-        265,  # affliction lock
-        267,  # destruction lock
+        WARLOCK_AFF,
+        WARLOCK_DESTR,
+        WARLOCK_DEMO,
         MAGE_FROST,
         MAGE_FIRE,
         MAGE_ARCANE,
-        262,  # Ele shaman
-        WARLOCK_DEMO,
+        SHAMAN_ELE,
     }
     healer_specs = {
         DRUID_RESTO,
@@ -214,7 +215,6 @@ class BossAnalyzer(object):
 
     @classmethod
     def create_raid_score_obj(cls, player, fight, spec):
-
         if spec not in SpecInfo.melee_dps_specs and spec not in SpecInfo.ranged_dps_specs and spec not in SpecInfo.healer_specs and spec not in SpecInfo.tank_specs:
             print("Unable to find spec {} ({})".format(spec, player.safe_name))
         return cls.SCORE_OBJ(player=player, fight=fight, spec=spec,

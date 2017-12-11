@@ -15,7 +15,7 @@ class WorldbreakerScore(RaidScore):
 
     @property
     def base_score(self):
-        return 50
+        return 90
 
     @property
     def table_keys(self):
@@ -34,7 +34,7 @@ class WorldbreakerScore(RaidScore):
     @property
     def score_description(self):
         return {
-            "Soaking Annihilation": "+1 points per annihilation circle soaked",
+            "Soaking Annihilation": "-8 points per missed soak. +2 points for every time you soak more than one annihilation / shrapnel",
             "Hit by the laser": "-15 points per time hit by the laser (Surging Fel) during Apocalypse Drive",
             "Hit by Decimation": "-15 points per time hit by the large Decimation circle",
         }
@@ -205,6 +205,12 @@ class VarimathrasScore(RaidScore):
             "Hit by shadow fissure": self.fissure
         }
 
+    @property
+    def score_description(self):
+        return {
+            "Hit by shadow fissure": "-5 points for each tick you take from Shadow Fissure.",
+        }
+
 
 class CovenScore(RaidScore):
     storm_damage = models.IntegerField(default=0)
@@ -216,7 +222,7 @@ class CovenScore(RaidScore):
 
     @property
     def base_score(self):
-        return 50
+        return 100
 
     @property
     def table_keys(self):
@@ -234,6 +240,17 @@ class CovenScore(RaidScore):
             "Norgannon damage": self.norgannon,
             "Khazgoroth damage": self.khazgoroth,
             "Golganoth damage": self.golganoth
+        }
+
+    @property
+    def score_description(self):
+        return {
+            "Norgannon damage": "-30 points (-20 if you are tank) for each time you are hit by a walking Norgannon add.",
+            "Khazgoroth damage": "-10 points for each tick you take from the flames of Khazgoroth",
+            "Golganoth damage": "-5 points for each tick you take from the lightning of Golganoth",
+            "Whirlwind damage": "-3 points when you are hit by the blade landing and -3 points for each tick you take from the spinning blades",
+            "Shadowblade damage": "-5 points each time you are hit by a shadowblade",
+            "Storm of Darkness hits": "-5 points for each tick you take from storm of darkness beyond the 2nd tick for each storm.",
         }
 
 
@@ -289,4 +306,12 @@ class ArgusScore(RaidScore):
             "Hit by Scythe": self.scythe,
             "Hit by Cosmic Ray": self.cosmic_ray,
             "Hit by Ember of Rage": self.ember_of_rage
+        }
+
+    @property
+    def score_description(self):
+        return {
+            "Hit by Death Fog": "-1 point for each tick of death fog you take.",
+            "Hit by Scythe": "-5 points for each time you are hit by scythe in phase 2.",
+            "Hit by Ember of Rage": "-10 points for each Ember of Rage (small swirl) stack you get in phase 4.",
         }

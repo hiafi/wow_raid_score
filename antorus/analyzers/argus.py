@@ -18,14 +18,7 @@ class ArgusAnalyzer(BossAnalyzer):
         self.save_score_objs()
 
     def bomb_burst_damage(self):
-        for event in self.client.get_events(self.wcl_fight,
-                                            filters={
-                                                "type": WCLEventTypes.damage,
-                                                "ability.id": 245674
-                                            }, actors_obj_dict=self.actors):
-            self.score_objs.get(event.target).khazgoroth -= 10
-            self.create_score_event(event.timestamp, "Was hit by Flames of Khaz'goroth (flamethrower)",
-                                    event.target)
+        pass
 
     def death_fog(self):
         for event in self.client.get_events(self.wcl_fight,

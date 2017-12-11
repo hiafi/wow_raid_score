@@ -79,11 +79,15 @@ class CovenAnalyzer(BossAnalyzer):
                                                 "type": WCLEventTypes.damage,
                                                 "ability.id": 245921
                                             }, actors_obj_dict=self.actors):
+            score_obj = self.score_objs.get(event.target)
             if time_last_hit[event.target] + 35000 < event.timestamp:
-                self.score_objs.get(event.target).norgannon -= 30
+                if score_obj.tank:
+                    score = 20
+                else:
+                    score = 30
+                score_obj.norgannon -= score
                 self.create_score_event(event.timestamp, "Was hit by Spectral Army of Norgannon (walking dudes)", event.target)
-            else:
-                time_last_hit[event.target] = event.timestamp
+            time_last_hit[event.target] = event.timestamp
 
     def khazgoroth(self):
         for event in self.client.get_events(self.wcl_fight,

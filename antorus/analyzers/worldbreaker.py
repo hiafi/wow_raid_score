@@ -64,7 +64,7 @@ class WorldbreakerAnalyzer(BossAnalyzer):
                                                 "type": WCLEventTypes.damage,
                                                 "ability.name": "Surging Fel"
                                             }, actors_obj_dict=self.actors):
-            if self.check_for_wipe(event.timestamp, self.STOP_AT_DEATH):
+            if self.check_for_wipe(event, self.STOP_AT_DEATH):
                 return
             self.score_objs.get(event.target).hit_from_laser -= 15
             self.create_score_event(event.timestamp, "Was hit by the laser", event.target)
@@ -76,7 +76,7 @@ class WorldbreakerAnalyzer(BossAnalyzer):
                                                 "ability.name": "Decimation",
                                                 "effectiveDamage": (">", 1000000)
                                             }, actors_obj_dict=self.actors):
-            if self.check_for_wipe(event.timestamp, self.STOP_AT_DEATH):
+            if self.check_for_wipe(event, self.STOP_AT_DEATH):
                 return
             self.score_objs.get(event.target).decimation -= 15
             self.create_score_event(event.timestamp, "Was hit by decimation", event.target)

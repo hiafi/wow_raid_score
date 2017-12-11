@@ -21,7 +21,7 @@ class VarimathrasAnalyzer(BossAnalyzer):
                                                 "type": WCLEventTypes.damage,
                                                 "ability.name": "Shadow Fissure"
                                             }, actors_obj_dict=self.actors):
-            if self.check_for_wipe(event.timestamp, death_count=self.STOP_AT_DEATH):
+            if self.check_for_wipe(event, death_count=self.STOP_AT_DEATH):
                 return
             self.score_objs.get(event.target).shadow_fissure -= 10
             self.create_score_event(event.timestamp, "took a tick of Shadow Fissure", event.target)

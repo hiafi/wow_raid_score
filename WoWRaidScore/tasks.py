@@ -23,7 +23,7 @@ def update_status(progress, update_progress=True):
 
 
 def get_progress(current_analyzer, num_analyzers, percentage_start):
-    return int(float(current_analyzer) / num_analyzers * percentage_start)
+    return int(float(current_analyzer) / max(num_analyzers, 1) * percentage_start)
 
 
 def _get_raid_obj(wcl_client, raid_id, user_id, group_id, delete_fights, overwrite):

@@ -73,7 +73,7 @@ class HighCommandScore(RaidScore):
 
     @property
     def base_score(self):
-        return 50
+        return 90
 
     @property
     def table_keys(self):
@@ -87,6 +87,13 @@ class HighCommandScore(RaidScore):
             "Stepped on a mine": self.step_on_mines,
             "Bladestorm": self.bladestorm,
             "Used the pods well": self.good_use_of_pod
+        }
+
+    @property
+    def score_description(self):
+        return {
+            "Bladestorm": "-1 * amount of times hit by the same blade storm past the second tick (EX: 6 points (3 + 2 + 1) for 5 ticks)",
+            "Stepped on a mine": "-5 points for each mine stepped on. Ignores mines that were stepped on if only you take damage from it and there are less than 2 stacks",
         }
 
 

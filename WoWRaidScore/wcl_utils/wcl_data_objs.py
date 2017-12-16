@@ -11,6 +11,8 @@ class WCLEventTypes(object):
     interrupt = "interrupt"
     dispel = "dispel"
     damage = "damage"
+    create = "create"
+    summon = "summon"
     death = "death"
     cast = "cast"
     combatant_info = "combatantinfo"
@@ -45,6 +47,7 @@ class WCLFight(object):
         self.percent = data.get("bossPercentage", 10000) / 100.0
         self.players = []
         self.enemies = {}
+        self.npcs = {}
 
     def set_attempt(self, attempt):
         self.attempt = attempt
@@ -54,6 +57,9 @@ class WCLFight(object):
 
     def add_enemy(self, enemy):
         self.enemies[enemy.id] = enemy
+
+    def add_npc(self, npc):
+        self.npcs[npc.id] = npc
 
     def get_readable_time(self, timestamp):
         time_dur = (timestamp - self.start_time_str) / 1000
@@ -101,6 +107,15 @@ class WCLEnemy(WCLActor):
 
     def __str__(self):
         return "<Enemy: {}>".format(unidecode(self.name))
+
+
+class WCLNPC(WCLActor):
+    def __init__(self, data):
+        super(WCLNPC, self).__init__(data)
+        self.instance = None
+
+    def __str__(self):
+        return "<NPC: {}>".format(unidecode(self.name))
 
 
 class WCLPlayerFightInfo(object):
@@ -170,7 +185,7 @@ class WCLTargetEvent(object):
     @property
     def readable_timestamp(self):
         minute, second = get_readable_time(self.timestamp, self.start_of_fight)
-        return "{}:{:02d}".format(minute, second)
+        return "{}:{:02d}".format(minute, int(second))
 
     def __str__(self):
         return "<Event {}: {}->{} {}>".format(self.type, self.safe_source, self.safe_target,
@@ -227,8 +242,15 @@ class WCLDispelEvent(WCLAbilityEventObj):
 class AbilityEventWithStatus(WCLAbilityEventObj):
     def __init__(self, data, fight, actor_objs_dict=None):
         super(AbilityEventWithStatus, self).__init__(data, fight, actor_objs_dict)
-        self.point_x = data.get("x")
-        self.point_y = data.get("y")
+        try:
+            self.point_x = data.get("x") / 10000.0
+        except TypeError:
+            self.point_x = None
+
+        try:
+            self.point_y = data.get("y") / 10000.0
+        except TypeError:
+            self.point_y = None
         self.hp_remaining = data.get("hitPoints")
         self.hp_max = data.get("maxHitPoints")
 

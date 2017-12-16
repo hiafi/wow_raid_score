@@ -63,6 +63,7 @@ def build_analyzers(wcl_fights, raid_obj, wcl_client):
             specs = _get_combatant_info(wcl_client, wcl_fight, players)
             score_objs = analyzer.create_raid_scores(players.values(), fight, specs)
             players.update(wcl_fight.enemies)
+            players.update(wcl_fight.npcs)
             analyzers.append(analyzer(wcl_fight, wcl_client, score_objs, players, fight))
         else:
             print("No fight {} found".format(wcl_fight.boss_id))

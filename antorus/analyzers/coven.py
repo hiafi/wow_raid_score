@@ -51,7 +51,7 @@ class CovenAnalyzer(BossAnalyzer):
                                             }, actors_obj_dict=self.actors):
             score = self.score_objs.get(event.target)
             if score:
-                score.whirlwind -= 3
+                score.whirlwind -= 5
                 self.create_score_event(event.timestamp, "Was hit by the whirlwind landing", event.target)
         for event in self.client.get_events(self.wcl_fight,
                                             filters={
@@ -60,7 +60,7 @@ class CovenAnalyzer(BossAnalyzer):
                                             }, actors_obj_dict=self.actors):
             score = self.score_objs.get(event.target)
             if score:
-                score.whirlwind -= 3
+                score.whirlwind -= 6
                 self.create_score_event(event.timestamp, "Was hit by the whirlwind spinning through them", event.target)
 
     def shadowblades(self):
@@ -95,7 +95,7 @@ class CovenAnalyzer(BossAnalyzer):
                                                 "type": WCLEventTypes.damage,
                                                 "ability.id": 245674
                                             }, actors_obj_dict=self.actors):
-            self.score_objs.get(event.target).khazgoroth -= 10
+            self.score_objs.get(event.target).khazgoroth -= 3
             self.create_score_event(event.timestamp, "Was hit by Flames of Khaz'goroth (flamethrower)",
                                     event.target)
 
@@ -107,5 +107,5 @@ class CovenAnalyzer(BossAnalyzer):
                                             }, actors_obj_dict=self.actors):
             score = self.score_objs.get(event.target)
             if not score.tank:
-                self.score_objs.get(event.target).golganoth -= 5
+                self.score_objs.get(event.target).golganoth -= 2
                 self.create_score_event(event.timestamp, "Was hit by Fury of Golganneth (chain lightning)", event.target)

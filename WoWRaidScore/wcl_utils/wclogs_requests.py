@@ -2,7 +2,7 @@ import requests
 import time
 from datetime import datetime
 
-from WoWRaidScore.wcl_utils.wcl_data_objs import WCLEventTypes, WCLRaid, WCLFight, WCLPlayer, WCLEnemy, create_event_obj
+from WoWRaidScore.wcl_utils.wcl_data_objs import WCLEventTypes, WCLRaid, WCLFight, WCLPlayer, WCLEnemy, WCLNPC, create_event_obj
 
 from collections import defaultdict
 
@@ -30,14 +30,20 @@ class WCLRequests(object):
         return WCLRequests.get_actors(r_json, "friendlies", WCLPlayer, ignore_npc=True)
 
     @staticmethod
+    def _get_npcs(r_json):
+        return WCLRequests.get_actors(r_json, "friendlies", WCLNPC, ignore_npc=False, only_npcs=True)
+
+    @staticmethod
     def _get_enemies(r_json):
         return WCLRequests.get_actors(r_json, "enemies", WCLEnemy, ignore_npc=False)
 
     @staticmethod
-    def get_actors(r_json, data_category, wcl_obj, ignore_npc=True):
+    def get_actors(r_json, data_category, wcl_obj, ignore_npc=True, only_npcs=False):
         actors = {}
         for actor in r_json.get(data_category):
             if ignore_npc and actor.get("type") in {'NPC', 'Unknown', 'Pet'}:
+                continue
+            if only_npcs and actor.get("type") not in {'NPC', 'Unknown', 'Pet'}:
                 continue
             p = wcl_obj(actor)
             actors[p.id] = p
@@ -80,6 +86,14 @@ class WCLRequests(object):
                 if fight:
                     fight.add_enemy(enemy)
 
+    @staticmethod
+    def _add_npcs_to_fights(npcs, fights):
+        for npc in npcs.values():
+            for fight_id in npc.fights:
+                fight = fights.get(fight_id)
+                if fight:
+                    fight.add_enemy(npc)
+
     def get_fights(self):
         url = "{}/report/fights/{code}?api_key={api_key}".format(WCLRequests.base_url(), code=self.raid_id,
                                                                  api_key=API_KEY)
@@ -87,9 +101,11 @@ class WCLRequests(object):
 
         wcl_players = WCLRequests._get_players(r_json)
         wcl_enemies = WCLRequests._get_enemies(r_json)
+        wcl_npcs = WCLRequests._get_npcs(r_json)
         wcl_fights = WCLRequests._get_fights(r_json)
         WCLRequests._add_players_to_fights(wcl_players, wcl_fights)
         WCLRequests._add_enemies_to_fights(wcl_enemies, wcl_fights)
+        WCLRequests._add_npcs_to_fights(wcl_npcs, wcl_fights)
 
         return wcl_fights
 
@@ -207,7 +223,6 @@ class WCLRequests(object):
         if end_time is None:
             end_time = fight.end_time_str
         data = self._get_table_json(view, start_time, end_time, filters)
-        print(data)
 
     def get_death_times(self, fight, actors_obj_dict=None):
         deaths = {}

@@ -97,6 +97,9 @@ class RaidScore(models.Model):
 
     objects = InheritanceManager()
 
+    def __str__(self):
+        return "<ScoreObj: {} - {}>".format(self.fight, self.player)
+
     @property
     def base_score(self):
         return 0

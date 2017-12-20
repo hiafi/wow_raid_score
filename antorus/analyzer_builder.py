@@ -5,7 +5,7 @@ antorus_fights = {
     2074: hounds.FelhoundsAnalyzer,
     2070: high_command.HighCommandAnalyzer,
     2064: portal_keeper.PortalKeeperAnalyzer,
-    2075: eonar.EonarAnalyzer,
+    # 2075: eonar.EonarAnalyzer,
     2082: imonar.ImonarAnalyzer,
     2088: kingaroth.KingarothAnalyzer,
     2069: varimathras.VarimathrasAnalyzer,  # Varimathris

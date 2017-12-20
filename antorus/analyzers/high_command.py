@@ -3,6 +3,7 @@ from WoWRaidScore.common.analyzer import BossAnalyzer
 from antorus.models import HighCommandScore
 from WoWRaidScore.wcl_utils.wcl_data_objs import WCLEventTypes
 from collections import defaultdict
+import math
 
 
 class MineLocation(object):
@@ -73,7 +74,11 @@ class HighCommandAnalyzer(BossAnalyzer):
             if times_hit_count > 3:
                 score_obj = self.score_objs.get(target)
                 if score_obj is not None and not score_obj.tank:
-                    score_obj.bladestorm -= sum([i for i in range(times_hit_count-1)])
+                    if score_obj.melee_dps:
+                        val = int(math.ceil(sum([i for i in range(times_hit_count-1)]) / 1.5))
+                    else:
+                        val = sum([i for i in range(times_hit_count - 1)])
+                    score_obj.bladestorm -= val
                     self.create_score_event(last_hit[target],
                                             "was hit by {} bladestorm ticks".format(times_hit_count),
                                             target)

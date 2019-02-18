@@ -269,7 +269,14 @@ class WCLDamageEvent(AbilityEventWithStatus):
         self.tick = data.get("tick")
         self.hit_type = data.get("hitType")
         self.damage_done = data.get("amount")
-        self.damage_total = self.damage_done + data.get("absorbed")
+        self.absorbed_damage = data.get("absorbed")
+        self.mitigated_damage = data.get("mitigated")
+        self.raw_damage = data.get("unmitigatedAmount")
+
+    @property
+    def damage_total(self):
+        print "This is depricated"
+        return self.raw_damage
 
     def __str__(self):
         return "<WCLDamageEvent{} {} {}->{} for {} damage. ({})>".format(" (tick)" if self.tick else "", self.name,

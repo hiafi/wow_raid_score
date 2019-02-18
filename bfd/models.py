@@ -6,6 +6,128 @@ from django.db import models
 from WoWRaidScore.models import RaidScore
 
 
+class ChampionScore(RaidScore):
+    wave_of_light = models.IntegerField(default=0)
+    divine_mallet = models.IntegerField(default=0)
+    blinding_faith = models.IntegerField(default=0)
+
+    wave_of_light_str = "Wave of Light"
+    divine_mallet_str = "Divine Mallet"
+    blinding_faith_str = "Blinding Faith"
+
+    @property
+    def base_score(self):
+        return 100
+
+    @property
+    def table_keys(self):
+        return [
+            self.wave_of_light_str,
+            self.divine_mallet_str,
+            self.blinding_faith_str,
+        ]
+
+    @property
+    def score_dict(self):
+        return {
+            self.wave_of_light_str: self.wave_of_light,
+            self.divine_mallet_str: self.divine_mallet,
+            self.blinding_faith_str: self.blinding_faith,
+        }
+
+    @property
+    def score_description(self):
+        return {
+            self.wave_of_light_str: "Getting hit by flames of punishment while on the fire side (right side). The best way to handle this mechanic is to stand in melee range right behind the boss.",
+            self.divine_mallet_str: "Standing too close to another player when dropping off volatile charge causes a large burst of damage that is often leathal. Try to stay out of the way when dropping off Volatile charge.",
+            self.blinding_faith_str: "You lose points by being hit by crush. Crush happens in phase 1 where the add slams half of the room, being hit by this stuns and deals damage.",
+        }
+
+
+class JadefireScore(RaidScore):
+    multisided_strike = models.IntegerField(default=0)
+    beam = models.IntegerField(default=0)
+    phoenix_strike = models.IntegerField(default=0)
+    failed_trap_fall = models.IntegerField(default=0)
+
+    multisided_strike_str = "Multi-Sided Strike"
+    beam_str = "P1 Beam"
+    phoenix_strike_str = "P2 Swirls"
+    failed_trap_fall_str = "Failed Flame Traps (falling)"
+
+    @property
+    def base_score(self):
+        return 100
+
+    @property
+    def table_keys(self):
+        return [
+            self.multisided_strike_str,
+            self.beam_str,
+            self.phoenix_strike_str,
+            self.failed_trap_fall_str,
+        ]
+
+    @property
+    def score_dict(self):
+        return {
+            self.multisided_strike_str: self.multisided_strike,
+            self.beam_str: self.beam,
+            self.phoenix_strike_str: self.phoenix_strike,
+            self.failed_trap_fall_str: self.failed_trap_fall,
+        }
+
+    @property
+    def score_description(self):
+        return {
+            self.multisided_strike_str: "Getting hit by flames of punishment while on the fire side (right side). The best way to handle this mechanic is to stand in melee range right behind the boss.",
+            self.beam_str: "Standing too close to another player when dropping off volatile charge causes a large burst of damage that is often leathal. Try to stay out of the way when dropping off Volatile charge.",
+            self.phoenix_strike_str: "You lose points by being hit by crush. Crush happens in phase 1 where the add slams half of the room, being hit by this stuns and deals damage.",
+            self.failed_trap_fall_str: "You lose points by being hit by crush. Crush happens in phase 1 where the add slams half of the room, being hit by this stuns and deals damage.",
+        }
+
+
+class GrongScore(RaidScore):
+    fear = models.IntegerField(default=0)
+    chill_of_death = models.IntegerField(default=0)
+    deathly_echo = models.IntegerField(default=0)
+    not_running_out_throw = models.IntegerField(default=0)
+
+    fear_str = "Fear"
+    chill_of_death_str = "Chill of Death"
+    deathly_echo_str = "Deathly Echo"
+    not_running_out_throw_str = "Not running throw out"
+
+    @property
+    def base_score(self):
+        return 100
+
+    @property
+    def table_keys(self):
+        return [
+            self.fear_str,
+            self.chill_of_death_str,
+            self.deathly_echo_str,
+            self.not_running_out_throw_str,
+        ]
+
+    @property
+    def score_dict(self):
+        return {
+            self.fear_str: self.fear,
+            self.chill_of_death_str: self.chill_of_death,
+            self.deathly_echo_str: self.deathly_echo,
+            self.not_running_out_throw_str: self.not_running_out_throw,
+        }
+
+    @property
+    def score_description(self):
+        return {
+            self.fear_str: "Getting hit by flames of punishment while on the fire side (right side). The best way to handle this mechanic is to stand in melee range right behind the boss.",
+            self.chill_of_death_str: "Standing too close to another player when dropping off volatile charge causes a large burst of damage that is often leathal. Try to stay out of the way when dropping off Volatile charge.",
+        }
+
+
 class OpulenceScore(RaidScore):
     flames_of_punishment = models.IntegerField(default=0)
     volatile_charge = models.IntegerField(default=0)

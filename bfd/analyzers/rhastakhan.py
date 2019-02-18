@@ -28,7 +28,10 @@ class RhastakhanAnalyzer(BossAnalyzer):
             if self.check_for_wipe(event, death_count=self.STOP_AT_DEATH):
                 return
             if isinstance(event.source, Player):
-                self.score_objs.get(event.source).plague_of_fire -= 15
+                score_obj = self.score_objs.get(event.source)
+                if score_obj.tank:
+                    continue
+                score_obj.plague_of_fire -= 15
                 self.create_score_event(event.timestamp, "spread plague of fire to {}".format(event.target.safe_name),
                                         event.source)
 

@@ -135,7 +135,7 @@ def view_parse_progress(request, raid_id):
 @login_required
 def parse_raid_legacy(request, raid_id):
     group = None
-    print("Starting parsing ", raid_id)
+    print("Starting parsing {}".format(raid_id))
     parse_raid_task(raid_id, request.user.id, group, overwrite=True, update_progress=False)
     print("Finished.")
     return render(request, 'parse.html', {})
@@ -144,7 +144,7 @@ def parse_raid_legacy(request, raid_id):
 @login_required
 def update_raid_legacy(request, raid_id):
     group = None
-    print("Starting to update ", raid_id)
+    print("Starting to update {}".format(raid_id))
     update_raid_to_current(raid_id, request.user.id, group)
     print("Finished.")
     return render(request, 'parse.html', {})

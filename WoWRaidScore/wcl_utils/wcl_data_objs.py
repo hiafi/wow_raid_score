@@ -254,14 +254,13 @@ class AbilityEventWithStatus(WCLAbilityEventObj):
         self.hp_remaining = data.get("hitPoints")
         self.hp_max = data.get("maxHitPoints")
 
-
     @property
     def hp_percent(self):
         return float(self.hp_remaining) / self.hp_max
 
     @property
     def location(self):
-        return (self.point_x, self.point_y)
+        return self.point_x, self.point_y
 
 
 class WCLDamageEvent(AbilityEventWithStatus):
@@ -293,8 +292,8 @@ class WCLHealEvent(AbilityEventWithStatus):
 
     def __str__(self):
         return "<WCLHealEvent{} {} {}->{} for {} health. ({})>".format(" (tick)" if self.tick else "", self.name,
-                                                                         self.safe_source, self.safe_target,
-                                                                         self.amount_healed, self.readable_timestamp)
+                                                                       self.safe_source, self.safe_target,
+                                                                       self.amount_healed, self.readable_timestamp)
 
 
 class WCLCastEvent(AbilityEventWithStatus):

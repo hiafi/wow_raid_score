@@ -1,12 +1,14 @@
 from django.core.exceptions import ObjectDoesNotExist
 from tos.analyzer_builder import tos_fights
 from antorus.analyzer_builder import antorus_fights
+from bfd.analyzer_builder import bfd_fights
 from WoWRaidScore.models import Player, Fight, Boss
 from WoWRaidScore.wcl_utils.wcl_data_objs import WCLEventTypes
 
 raid_id_to_fight_dict = {
     13: tos_fights,
-    17: antorus_fights
+    17: antorus_fights,
+    21: bfd_fights
 }
 
 
@@ -61,6 +63,9 @@ def build_analyzers(wcl_fights, raid_obj, wcl_client):
             fight = _create_fight_obj(wcl_fight, raid_obj)
             players = {wcl_player.id: player_objs.get(wcl_player.id) for wcl_player in wcl_fight.players}
             specs = _get_combatant_info(wcl_client, wcl_fight, players)
+            if not specs:
+                print("Unable to get specs for fight {}".format(fight))
+                continue
             score_objs = analyzer.create_raid_scores(players.values(), fight, specs)
             players.update(wcl_fight.enemies)
             players.update(wcl_fight.npcs)

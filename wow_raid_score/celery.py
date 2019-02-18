@@ -13,7 +13,7 @@ app = Celery('wow_raid_score', broker="amqp://", backend="amqp://")
 app.config_from_object('django.conf:settings')
 
 # Load task modules from all registered Django app configs.
-app.autodiscover_tasks(["WoWRaidScore", "tos"])
+app.autodiscover_tasks(["WoWRaidScore", "tos", "bfd"])
 
 
 @app.task(bind=True)

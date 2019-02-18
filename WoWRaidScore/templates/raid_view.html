@@ -5,7 +5,7 @@
 
     {% for boss in boss_order %}
     <div >
-        <div style="text-align: center;"><b>{{boss.name}}</b></div>
+        <div style="text-align: center;"><b>{{boss.name|safe}}</b></div>
         <table style='margin: 0px auto;'>
         <tr>
             <td class="boss_view_text_rankings">
@@ -34,7 +34,7 @@ var myChart = new Chart(ctx, {
             {% for label, value in score_list %}
             {
                 data: [{{ value }}],
-                label: "{{label}}",
+                label: "{{ label|safe }}",
                 backgroundColor: {% if value >= 0 %}"#c0ffa3"{% else %}"#ffa6a3"{% endif %}
             },
             {% endfor %}

@@ -2,6 +2,7 @@ from WoWRaidScore.models import RaidScore, FightEvent
 from WoWRaidScore.wcl_utils.wcl_data_objs import WCLEventTypes
 from collections import defaultdict
 from WoWRaidScore.wcl_utils.wcl_util_functions import get_readable_time
+from wow_raid_score.settings import DEBUG_EVENTS
 
 import math
 
@@ -30,13 +31,13 @@ class PlayerStatus(object):
 
 class SpecInfo(object):
     DH_VENG = 581
-    DH_HAVOC = None
+    DH_HAVOC = 577
     DK_BLOOD = 250
     DK_FROST = 251
     DK_UNHOLY = 252
     DRUID_GUARDIAN = 104
     DRUID_BALANCE = 102
-    DRUID_FERAL = None
+    DRUID_FERAL = 103
     DRUID_RESTO = 105
     HUNTER_BM = 253
     HUNTER_MM = 254
@@ -48,13 +49,14 @@ class SpecInfo(object):
     MONK_BM = 268
     MONK_WW = 269
     PALADIN_HOLY = 65
-    PALADIN_RET = None
-    PALADIN_PROT = None
+    PALADIN_RET = 70
+    PALADIN_PROT = 66
     PRIEST_HOLY = 257
-    PRIEST_DISC = None
+    PRIEST_DISC = 256
     PRIEST_SHADOW = 258
     ROGUE_SUB = 261
-    ROGUE_ASS = None
+    ROGUE_ASS = 259
+    ROGUE_OUTLAW = 260
     SHAMAN_RESTO = 264
     SHAMAN_ELE = 262
     SHAMAN_ENH = 263
@@ -66,18 +68,19 @@ class SpecInfo(object):
     WARRIOR_FURY = None
 
     melee_dps_specs = {
-        259,
-        70,
-        71,
-        577,
         SHAMAN_ENH,  # Enh Shaman
         MONK_WW,  # WW monk
         WARRIOR_ARMS,  # Arms war
         DK_FROST,  # Frost DK
         DK_UNHOLY,
         ROGUE_SUB,  # sub rogue
+        ROGUE_OUTLAW,
+        ROGUE_ASS,
+        DRUID_FERAL,
+        PALADIN_RET
     }
     ranged_dps_specs = {
+        DH_HAVOC,
         PRIEST_SHADOW,
         DRUID_BALANCE,
         HUNTER_BM,
@@ -217,6 +220,8 @@ class BossAnalyzer(object):
     def create_raid_score_obj(cls, player, fight, spec):
         if spec not in SpecInfo.melee_dps_specs and spec not in SpecInfo.ranged_dps_specs and spec not in SpecInfo.healer_specs and spec not in SpecInfo.tank_specs:
             print("Unable to find spec {} ({})".format(spec, player.safe_name))
+        if spec is None:
+            print("Unable to determine spec {} - {} - {}".format(spec, player.safe_name, fight))
         return cls.SCORE_OBJ(player=player, fight=fight, spec=spec,
                              melee_dps=spec in SpecInfo.melee_dps_specs,
                              ranged_dps=spec in SpecInfo.ranged_dps_specs,
@@ -264,6 +269,9 @@ class BossAnalyzer(object):
         return deaths
 
     def create_score_event(self, timestamp, text, player=None):
+        if DEBUG_EVENTS:
+            tmin, tsec = get_readable_time(timestamp, self.wcl_fight.start_time_str)
+            print("[{}:{:02d}] {} - {}".format(tmin, tsec, player.safe_name, text))
         minute, second = get_readable_time(timestamp, self.wcl_fight.start_time_str)
         fe = FightEvent(fight=self.fight_obj, player=player, minute=minute, second=second, text=text)
         fe.save()

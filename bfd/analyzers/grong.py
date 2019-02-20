@@ -47,7 +47,7 @@ class GrongAnalyzer(BossAnalyzer):
                                             }, actors_obj_dict=self.actors):
             if self.check_for_wipe(event, death_count=self.STOP_AT_DEATH):
                 return
-            if last_tick.get(event.target) < event.timestamp + 3000:
+            if last_tick.get(event.target, 0) < event.timestamp + 3000:
                 num_ticks[event.target] += 1
             last_tick[event.target] = event.timestamp
 

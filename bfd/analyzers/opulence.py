@@ -14,6 +14,8 @@ class OpulenceAnalyzer(BossAnalyzer):
         self.flames_of_punishment()
         self.volatile_charge()
         self.crush()
+        self.flame_jets()
+        self.scorching_ground()
         self.cleanup()
         self.save_score_objs()
 
@@ -36,6 +38,36 @@ class OpulenceAnalyzer(BossAnalyzer):
             self.score_objs.get(event.target).flames_of_punishment -= 20
             self.create_score_event(event.timestamp, "was hit by a Flames of Punishment",
                                     event.target)
+
+    def flame_jets(self):
+        last_hit = {}
+        for event in self.client.get_events(self.wcl_fight,
+                                            filters={
+                                                "type": [WCLEventTypes.damage],
+                                                "ability.name": "Flame Jet"
+                                            }, actors_obj_dict=self.actors):
+            if self.check_for_wipe(event, death_count=self.STOP_AT_DEATH):
+                return
+            if event.damage_done <= 10000:
+                continue
+            if event.timestamp < last_hit.get(event.target, -2000) + 3000:
+                self.score_objs.get(event.target).flame_jets -= 3
+            last_hit[event.target] = event.timestamp
+
+    def scorching_ground(self):
+        last_hit = {}
+        for event in self.client.get_events(self.wcl_fight,
+                                            filters={
+                                                "type": [WCLEventTypes.damage],
+                                                "ability.name": "Scorching Ground"
+                                            }, actors_obj_dict=self.actors):
+            if self.check_for_wipe(event, death_count=self.STOP_AT_DEATH):
+                return
+            if event.damage_done <= 10000:
+                continue
+            if event.timestamp < last_hit.get(event.target, -2000) + 500:
+                self.score_objs.get(event.target).lasers -= 1
+            last_hit[event.target] = event.timestamp
 
     def volatile_charge(self):
         for event in self.client.get_events(self.wcl_fight,

@@ -132,12 +132,16 @@ class OpulenceScore(RaidScore):
     flames_of_punishment = models.IntegerField(default=0)
     volatile_charge = models.IntegerField(default=0)
     crush = models.IntegerField(default=0)
+    flame_jets = models.IntegerField(default=0)
+    lasers = models.IntegerField(default=0)
     molten_gold = models.IntegerField(default=0)
     deadly_hex = models.IntegerField(default=0)
 
     flames_of_punishment_str = "Flames of Punishment"
     volatile_charge_str = "Volatile Charge"
     crush_str = "Crush"
+    flame_jets_str = "Flame Jets"
+    lasers_str = "Scorching Ground (laser)"
     molten_gold_str = "Molten Gold"
     deadly_hex_str = "Deadly Hex"
 
@@ -151,6 +155,8 @@ class OpulenceScore(RaidScore):
             self.flames_of_punishment_str,
             self.volatile_charge_str,
             self.crush_str,
+            self.flame_jets_str,
+            self.lasers_str,
             self.molten_gold_str,
             self.deadly_hex_str
         ]
@@ -161,6 +167,8 @@ class OpulenceScore(RaidScore):
             self.flames_of_punishment_str: self.flames_of_punishment,
             self.volatile_charge_str: self.volatile_charge,
             self.crush_str: self.crush,
+            self.flame_jets_str: self.flame_jets,
+            self.lasers_str: self.lasers,
             self.molten_gold_str: self.molten_gold,
             self.deadly_hex_str: self.deadly_hex,
         }
@@ -171,6 +179,8 @@ class OpulenceScore(RaidScore):
             self.flames_of_punishment_str: "Getting hit by flames of punishment while on the fire side (right side). The best way to handle this mechanic is to stand in melee range right behind the boss.",
             self.volatile_charge_str: "Standing too close to another player when dropping off volatile charge causes a large burst of damage that is often leathal. Try to stay out of the way when dropping off Volatile charge.",
             self.crush_str: "You lose points by being hit by crush. Crush happens in phase 1 where the add slams half of the room, being hit by this stuns and deals damage.",
+            self.flame_jets_str: "Flame jets are fairly nasty on mythic, especially lightening side. Taking 2 or more ticks will give you a -3 penalty per tick after the first one.",
+            self.lasers_str: "Standing in the fire from the laser is bad. Taking 2 or more ticks in a row will give you a -2 penalty per tick after the first.",
         }
 
 

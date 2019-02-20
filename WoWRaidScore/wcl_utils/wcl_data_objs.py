@@ -275,7 +275,7 @@ class WCLDamageEvent(AbilityEventWithStatus):
 
     @property
     def damage_total(self):
-        print "This is depricated"
+        print("This is depricated")
         return self.raw_damage
 
     def __str__(self):

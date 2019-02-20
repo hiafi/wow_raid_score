@@ -10,7 +10,9 @@ class ConclaveAnalyzer(BossAnalyzer):
     STOP_AT_DEATH = 3
 
     paku_wrath_threshold = {
-        BossAnalyzer.MYTHIC_DIFFICULTY: 70000
+        BossAnalyzer.MYTHIC_DIFFICULTY: 70000,
+        BossAnalyzer.HEROIC_DIFFICULTY: 20000,
+        BossAnalyzer.NORMAL_DIFFICULTY: 10000,
     }
 
     def analyze(self):

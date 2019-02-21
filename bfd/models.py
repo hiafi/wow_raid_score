@@ -190,12 +190,14 @@ class ConclaveScore(RaidScore):
     kragwa_wrath = models.IntegerField(default=0)
     static_orb = models.IntegerField(default=0)
     paku_wrath = models.IntegerField(default=0)
+    raptor_damage = models.IntegerField(default=0)
 
     lacerating_claws_str = "Lacerating Claws"
     kimbul_wrath_str = "Kimbul\'s Wrath"
     kragwa_wrath_str = "Krag\'wa's Wrath"
     static_orb_str = "Static Orb"
     paku_wrath_str = "Pa\'ku's Wrath"
+    raptor_damage_str = "Raptors"
 
     @property
     def base_score(self):
@@ -208,7 +210,8 @@ class ConclaveScore(RaidScore):
             self.kimbul_wrath_str,
             self.kragwa_wrath_str,
             self.static_orb_str,
-            self.paku_wrath_str
+            self.paku_wrath_str,
+            self.raptor_damage_str,
         ]
 
     @property
@@ -219,6 +222,7 @@ class ConclaveScore(RaidScore):
             self.kragwa_wrath_str: self.kragwa_wrath,
             self.static_orb_str: self.static_orb,
             self.paku_wrath_str: self.paku_wrath,
+            self.raptor_damage_str: self.raptor_damage,
         }
 
     @property
@@ -229,6 +233,7 @@ class ConclaveScore(RaidScore):
             self.kragwa_wrath_str: "Krag'wa will occasionally jump to the furthest target creating a large damage zone knocking players back and dealing damage, this is espcially bad during Pa'ku's wrath.",
             self.static_orb_str: "Static Orb is caused by Akuna. When the debuff expires 5 orbs are created, touching one of them will cause damage and will stun",
             self.paku_wrath_str: "Every minute, Pa'ku will fly down and deal a lot of damage to anyone who isn't standing near him.",
+            self.raptor_damage_str: "Raptors chase you through the room. If you bring them close to the other raptors it increases their speed.",
         }
 
 
@@ -272,4 +277,143 @@ class RhastakhanScore(RaidScore):
             self.toads_str: "Occasionally a wave of toads will be fired off. Getting hit by these toads puts a fairly massive dot on you and should be avoided.",
             self.seal_of_purification_str: "In mythic, Seal of purification leaves a flame trial following the laser, standing in this causes a lot of unneeded damage.",
             self.plague_of_fire_str: "Every 30 seconds or so, Rhastakhan will put plague of fire on players. If those players are not spread out, nearby players will be affected by their plague of fire leading to massive issues of spreading.",
+        }
+
+
+class MekkatorqueScore(RaidScore):
+    buster_cannon = models.IntegerField(default=0)
+    blastoff = models.IntegerField(default=0)
+    trample = models.IntegerField(default=0)
+    failed_bots = models.IntegerField(default=0)
+    sheep = models.IntegerField(default=0)
+    gigavolt_blast = models.IntegerField(default=0)
+
+    buster_cannon_str = "Buster Cannon"
+    blastoff_str = "Blast off / Crash Down"
+    trample_str = "Trampled"
+    failed_bots_str = "Failed Bot"
+    sheep_str = "Sheep Shrapnel"
+    gigavolt_blast_str = "Gigavolt Blast"
+
+    @property
+    def base_score(self):
+        return 100
+
+    @property
+    def table_keys(self):
+        return [
+            self.buster_cannon_str,
+            self.blastoff_str,
+            self.trample_str,
+            self.failed_bots_str,
+            self.sheep_str,
+            self.gigavolt_blast_str,
+        ]
+
+    @property
+    def score_dict(self):
+        return {
+            self.buster_cannon_str: self.buster_cannon,
+            self.blastoff_str: self.blastoff,
+            self.trample_str: self.trample,
+            self.failed_bots_str: self.failed_bots,
+            self.sheep_str: self.sheep,
+            self.gigavolt_blast_str: self.gigavolt_blast,
+        }
+
+    @property
+    def score_description(self):
+        return {
+            self.buster_cannon_str: "",
+            self.blastoff_str: "",
+            self.trample_str: "",
+            self.failed_bots_str: "",
+            self.sheep_str: "",
+            self.gigavolt_blast_str: "",
+        }
+
+
+class BlockadeScore(RaidScore):
+    voltaic_flash = models.IntegerField(default=0)
+    sea_swell = models.IntegerField(default=0)
+    sea_storm = models.IntegerField(default=0)
+    torrential_swell = models.IntegerField(default=0)
+
+    voltaic_flash_str = "Voltaic Flash"
+    sea_swell_str = "Sea Swell"
+    sea_storm_str = "Sea Storm"
+    torrential_swell_str = "Torrential Swell"
+
+    @property
+    def base_score(self):
+        return 100
+
+    @property
+    def table_keys(self):
+        return [
+            self.voltaic_flash_str,
+            self.sea_swell_str,
+            self.sea_storm_str,
+            self.torrential_swell_str,
+        ]
+
+    @property
+    def score_dict(self):
+        return {
+            self.voltaic_flash_str: self.voltaic_flash,
+            self.sea_swell_str: self.sea_swell,
+            self.sea_storm_str: self.sea_storm,
+            self.torrential_swell_str: self.torrential_swell,
+        }
+
+    @property
+    def score_description(self):
+        return {
+            self.voltaic_flash_str: "",
+            self.sea_swell_str: "",
+            self.sea_storm_str: "",
+            self.torrential_swell_str: "",
+        }
+
+
+class JainaScore(RaidScore):
+    avalanche = models.IntegerField(default=0)
+    glacial_ray = models.IntegerField(default=0)
+    glacial_shards = models.IntegerField(default=0)
+    icefall = models.IntegerField(default=0)
+
+    avalanche_str = "Avalanche"
+    glacial_ray_str = "Avalanche"
+    glacial_shards_str = "Avalanche"
+    icefall_str = "Avalanche"
+
+    @property
+    def base_score(self):
+        return 100
+
+    @property
+    def table_keys(self):
+        return [
+            self.avalanche_str,
+            self.glacial_ray_str,
+            self.glacial_shards_str,
+            self.icefall_str,
+        ]
+
+    @property
+    def score_dict(self):
+        return {
+            self.avalanche_str: self.avalanche,
+            self.glacial_ray_str: self.glacial_ray,
+            self.glacial_shards_str: self.glacial_shards,
+            self.icefall_str: self.icefall,
+        }
+
+    @property
+    def score_description(self):
+        return {
+            self.avalanche_str: "",
+            self.glacial_ray_str: "",
+            self.glacial_shards_str: "",
+            self.icefall_str: "",
         }

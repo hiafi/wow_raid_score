@@ -47,7 +47,7 @@
 <div><button type="button" class="btn btn-info" data-toggle="collapse" data-target="#events">Events</button></div>
     <div id="events" class="collapse">
     {% for event in events %}
-        <div>Attempt {{ event.fight.attempt }} ({{ event.minute }}:{{ event.second_string }}): {{ event.text }}</div>
+        <div>Attempt {{ event.fight.attempt }} ({{ event.minute }}:{{ event.second_string }}): {{ event.text }} ({{ event.score_value }} points)</div>
     {% endfor %}
     </div>
 

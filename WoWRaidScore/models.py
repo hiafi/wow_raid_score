@@ -123,6 +123,7 @@ class FightEvent(models.Model):
     minute = models.IntegerField()
     second = models.IntegerField()
     text = models.TextField()
+    score_value = models.IntegerField(null=True, blank=True)
 
     @property
     def second_string(self):

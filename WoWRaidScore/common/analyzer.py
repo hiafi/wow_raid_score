@@ -268,12 +268,13 @@ class BossAnalyzer(object):
         self._cached_deaths = deaths
         return deaths
 
-    def create_score_event(self, timestamp, text, player=None):
+    def create_score_event(self, timestamp, text, player=None, point_value=None):
         if DEBUG_EVENTS:
             tmin, tsec = get_readable_time(timestamp, self.wcl_fight.start_time_str)
             print("[{}:{:02d}] {} - {}".format(tmin, tsec, player.safe_name, text))
         minute, second = get_readable_time(timestamp, self.wcl_fight.start_time_str)
-        fe = FightEvent(fight=self.fight_obj, player=player, minute=minute, second=second, text=text)
+        fe = FightEvent(fight=self.fight_obj, player=player, minute=minute, second=second,
+                        text=text, score_value=point_value)
         fe.save()
 
     def get_player_death_order(self):

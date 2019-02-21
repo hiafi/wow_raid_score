@@ -35,7 +35,8 @@ class OpulenceAnalyzer(BossAnalyzer):
             if event.timestamp < last_hit.get(event.target, -2000) + 2000:
                 continue
             last_hit[event.target] = event.timestamp
-            self.score_objs.get(event.target).flames_of_punishment -= 20
+            score_obj = self.score_objs.get(event.target)
+            score_obj.flames_of_punishment -= 10 if score_obj.tank else 50
             self.create_score_event(event.timestamp, "was hit by a Flames of Punishment",
                                     event.target)
 
@@ -50,8 +51,8 @@ class OpulenceAnalyzer(BossAnalyzer):
                 return
             if event.damage_done <= 10000:
                 continue
-            if event.timestamp < last_hit.get(event.target, -2000) + 3000:
-                self.score_objs.get(event.target).flame_jets -= 3
+            if event.timestamp < last_hit.get(event.target, -2000) + 10000:
+                self.score_objs.get(event.target).flame_jets -= 8
             last_hit[event.target] = event.timestamp
 
     def scorching_ground(self):
@@ -79,7 +80,7 @@ class OpulenceAnalyzer(BossAnalyzer):
                 return
             if isinstance(event.target, int):
                 continue
-            self.score_objs.get(event.source).volatile_charge -= 15
+            self.score_objs.get(event.source).volatile_charge -= 5
             self.create_score_event(event.timestamp, "hit {} by a Volatile Charge".format(event.target.safe_name),
                                     event.source)
 
@@ -91,7 +92,7 @@ class OpulenceAnalyzer(BossAnalyzer):
                                             }, actors_obj_dict=self.actors):
             if self.check_for_wipe(event, death_count=self.STOP_AT_DEATH):
                 return
-            self.score_objs.get(event.target).crush -= 10
+            self.score_objs.get(event.target).crush -= 30
             self.create_score_event(event.timestamp, "was hit by Crush!",
                                     event.target)
 

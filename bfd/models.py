@@ -287,6 +287,7 @@ class MekkatorqueScore(RaidScore):
     failed_bots = models.IntegerField(default=0)
     sheep = models.IntegerField(default=0)
     gigavolt_blast = models.IntegerField(default=0)
+    radiation = models.IntegerField(default=0)
 
     buster_cannon_str = "Buster Cannon"
     blastoff_str = "Blast off / Crash Down"
@@ -294,6 +295,7 @@ class MekkatorqueScore(RaidScore):
     failed_bots_str = "Failed Bot"
     sheep_str = "Sheep Shrapnel"
     gigavolt_blast_str = "Gigavolt Blast"
+    radiation_str = "Radiation"
 
     @property
     def base_score(self):
@@ -308,6 +310,7 @@ class MekkatorqueScore(RaidScore):
             self.failed_bots_str,
             self.sheep_str,
             self.gigavolt_blast_str,
+            self.radiation_str,
         ]
 
     @property
@@ -318,7 +321,7 @@ class MekkatorqueScore(RaidScore):
             self.trample_str: self.trample,
             self.failed_bots_str: self.failed_bots,
             self.sheep_str: self.sheep,
-            self.gigavolt_blast_str: self.gigavolt_blast,
+            self.radiation_str: self.radiation,
         }
 
     @property
@@ -330,6 +333,7 @@ class MekkatorqueScore(RaidScore):
             self.failed_bots_str: "",
             self.sheep_str: "",
             self.gigavolt_blast_str: "",
+            self.radiation_str: "",
         }
 
 

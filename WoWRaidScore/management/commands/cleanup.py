@@ -13,7 +13,7 @@ class Command(BaseCommand):
         raids = set()
         score_objs = RaidScore.objects.filter(fight__in=fights).order_by().select_subclasses()
 
-        self.stdout.write("Deleting score objects ({})".format(score_objs))
+        self.stdout.write("Deleting score objects ({})".format(len(score_objs)))
         for so in score_objs:
             so.delete()
 

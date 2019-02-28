@@ -5,7 +5,7 @@ from WoWRaidScore.wcl_utils.wcl_data_objs import WCLEventTypes
 from collections import defaultdict
 
 
-class MekkatorqueAnalyzer(BossAnalyzer):
+class JainaAnalyzer(BossAnalyzer):
     SCORE_OBJ = JainaScore
     STOP_AT_DEATH = 3
 

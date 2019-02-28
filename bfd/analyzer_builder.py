@@ -1,4 +1,4 @@
-from bfd.analyzers import opulence, conclave, rhastakhan, champion, jadefire, grong
+from bfd.analyzers import opulence, conclave, rhastakhan, champion, jadefire, grong, mekkatorque, blockade, jaina
 
 bfd_fights = {
     2265: champion.ChampionAnalyzer,  # Champions
@@ -7,7 +7,7 @@ bfd_fights = {
     2271: opulence.OpulenceAnalyzer,
     2268: conclave.ConclaveAnalyzer,
     2272: rhastakhan.RhastakhanAnalyzer,
-    2276: None,  # Mekkatorque
-    2280: None,  # Blockade
-    2281: None,  # Jaina
+    2276: mekkatorque.MekkatorqueAnalyzer,  # Mekkatorque
+    2280: blockade.BlockadeAnalyzer,  # Blockade
+    2281: jaina.JainaAnalyzer,  # Jaina
 }

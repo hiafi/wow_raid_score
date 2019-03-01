@@ -49,7 +49,7 @@ class MekkatorqueAnalyzer(BossAnalyzer):
     def sheep(self):
         for event in self.client.get_events(self.wcl_fight,
                                             filters={
-                                                "type": [WCLEventTypes.damage],
+                                                "type": [WCLEventTypes.apply_debuff],
                                                 "ability.name": "Sheep Shrapnel"
                                             }, actors_obj_dict=self.actors):
             if self.check_for_wipe(event, death_count=self.STOP_AT_DEATH):

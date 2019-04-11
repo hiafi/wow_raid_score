@@ -338,7 +338,6 @@ class MekkatorqueScore(RaidScore):
 
 
 class BlockadeScore(RaidScore):
-    voltaic_flash = models.IntegerField(default=0)
     sea_swell = models.IntegerField(default=0)
     sea_storm = models.IntegerField(default=0)
     torrential_swell = models.IntegerField(default=0)
@@ -382,11 +381,17 @@ class BlockadeScore(RaidScore):
 
 class JainaScore(RaidScore):
     avalanche = models.IntegerField(default=0)
+    standing_in_fire = models.IntegerField(default=0)
+    bombards = models.IntegerField(default=0)
+    ice_blocked = models.IntegerField(default=0)
     glacial_ray = models.IntegerField(default=0)
     glacial_shards = models.IntegerField(default=0)
     icefall = models.IntegerField(default=0)
 
     avalanche_str = "Avalanche"
+    bombard_str = "Bombard"
+    standing_in_fire_str = "Standing in Fire"
+    ice_blocked_str = "Ice Blocked"
     glacial_ray_str = "Avalanche"
     glacial_shards_str = "Avalanche"
     icefall_str = "Avalanche"
@@ -399,18 +404,18 @@ class JainaScore(RaidScore):
     def table_keys(self):
         return [
             self.avalanche_str,
-            self.glacial_ray_str,
-            self.glacial_shards_str,
-            self.icefall_str,
+            self.bombard_str,
+            self.standing_in_fire_str,
+            self.ice_blocked_str,
         ]
 
     @property
     def score_dict(self):
         return {
             self.avalanche_str: self.avalanche,
-            self.glacial_ray_str: self.glacial_ray,
-            self.glacial_shards_str: self.glacial_shards,
-            self.icefall_str: self.icefall,
+            self.bombard_str: self.bombards,
+            self.standing_in_fire_str: self.standing_in_fire,
+            self.ice_blocked_str: self.ice_blocked,
         }
 
     @property

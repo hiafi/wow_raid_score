@@ -6,3 +6,4 @@ db.sqlite3
 install.sh
 apache_config
 *.log
+wow_raid_score/__init__.py

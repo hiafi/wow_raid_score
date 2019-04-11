@@ -63,7 +63,7 @@ class SpecInfo(object):
     WARLOCK_AFF = 265
     WARLOCK_DESTR = 267
     WARLOCK_DEMO = 266
-    WARRIOR_PROT = None
+    WARRIOR_PROT = 73
     WARRIOR_ARMS = 72
     WARRIOR_FURY = None
 

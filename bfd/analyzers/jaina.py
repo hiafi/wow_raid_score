@@ -11,7 +11,7 @@ class JainaAnalyzer(BossAnalyzer):
 
     AVALANCHE_SCORE = 30
     ICEBLOCK_SCORE = 30
-    BOMBARD_SCORE = 20
+    BOMBARD_SCORE = 25
 
     def analyze(self):
         print("Analyzing {}".format(self.wcl_fight))

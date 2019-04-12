@@ -9,9 +9,9 @@ class JainaAnalyzer(BossAnalyzer):
     SCORE_OBJ = JainaScore
     STOP_AT_DEATH = 3
 
-    AVALANCHE_SCORE = 20
+    AVALANCHE_SCORE = 30
     ICEBLOCK_SCORE = 30
-    BOMBARD_SCORE = 30
+    BOMBARD_SCORE = 20
 
     def analyze(self):
         print("Analyzing {}".format(self.wcl_fight))
@@ -36,7 +36,7 @@ class JainaAnalyzer(BossAnalyzer):
             if last_hit.get(event.target, 0) >= event.timestamp - 1200:
                 times_hit[event.target] += 1
                 if times_hit[event.target] >= 2:
-                    points = 5 ** (times_hit[event.target] - 1)
+                    points = 3 ** (times_hit[event.target])
                     self.score_objs.get(event.target).standing_in_fire -= points
                     self.create_score_event(event.timestamp, "stood in fire (tick {})".format(times_hit[event.target]),
                                             event.target, points)

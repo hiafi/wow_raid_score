@@ -9,6 +9,10 @@ class JainaAnalyzer(BossAnalyzer):
     SCORE_OBJ = JainaScore
     STOP_AT_DEATH = 3
 
+    AVALANCHE_SCORE = 20
+    ICEBLOCK_SCORE = 30
+    BOMBARD_SCORE = 30
+
     def analyze(self):
         print("Analyzing {}".format(self.wcl_fight))
         self.avalanche()
@@ -32,7 +36,7 @@ class JainaAnalyzer(BossAnalyzer):
             if last_hit.get(event.target, 0) >= event.timestamp - 1200:
                 times_hit[event.target] += 1
                 if times_hit[event.target] >= 2:
-                    points = 2 ** times_hit[event.target]
+                    points = 5 ** (times_hit[event.target] - 1)
                     self.score_objs.get(event.target).standing_in_fire -= points
                     self.create_score_event(event.timestamp, "stood in fire (tick {})".format(times_hit[event.target]),
                                             event.target, points)
@@ -51,9 +55,9 @@ class JainaAnalyzer(BossAnalyzer):
             score_obj = self.score_objs.get(event.target)
             if score_obj.tank:
                 continue
-            score_obj.avalanche -= 10
+            score_obj.avalanche -= self.AVALANCHE_SCORE
             self.create_score_event(event.timestamp, "stood in fire",
-                                    event.target)
+                                    event.target, self.AVALANCHE_SCORE)
 
     def ice_block(self):
         for event in self.client.get_events(self.wcl_fight,
@@ -63,9 +67,9 @@ class JainaAnalyzer(BossAnalyzer):
                                             }, actors_obj_dict=self.actors):
             if self.check_for_wipe(event, death_count=self.STOP_AT_DEATH):
                 return
-            self.score_objs.get(event.target).ice_blocked -= 10
+            self.score_objs.get(event.target).ice_blocked -= self.ICEBLOCK_SCORE
             self.create_score_event(event.timestamp, "got iceblocked",
-                                    event.target)
+                                    event.target, self.ICEBLOCK_SCORE)
 
     def bombard(self):
         for event in self.client.get_events(self.wcl_fight,
@@ -75,7 +79,7 @@ class JainaAnalyzer(BossAnalyzer):
                                             }, actors_obj_dict=self.actors):
             if self.check_for_wipe(event, death_count=self.STOP_AT_DEATH):
                 return
-            self.score_objs.get(event.target).bombards -= 10
+            self.score_objs.get(event.target).bombards -= self.BOMBARD_SCORE
             self.create_score_event(event.timestamp, "got hit by bombard",
-                                    event.target)
+                                    event.target, self.BOMBARD_SCORE)
 

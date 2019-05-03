@@ -388,6 +388,7 @@ class JainaScore(RaidScore):
     freezing_blast = models.IntegerField(default=0)
     icefall = models.IntegerField(default=0)
     broadside = models.IntegerField(default=0)
+    heart_of_frost = models.IntegerField(default=0)
 
     avalanche_str = "Avalanche"
     bombard_str = "Bombard"
@@ -397,6 +398,7 @@ class JainaScore(RaidScore):
     freezing_blast_str = "Freezing Blast"
     icefall_str = "Icefall"
     broadside_str = "Broadside"
+    heart_of_frost_str = "Heart of Frost"
 
     @property
     def base_score(self):
@@ -411,6 +413,7 @@ class JainaScore(RaidScore):
             self.ice_blocked_str,
             self.freezing_blast_str,
             self.glacial_ray_str,
+            self.heart_of_frost_str,
         ]
 
     @property
@@ -422,6 +425,7 @@ class JainaScore(RaidScore):
             self.ice_blocked_str: self.ice_blocked,
             self.freezing_blast_str: self.freezing_blast,
             self.glacial_ray_str: self.glacial_ray,
+            self.heart_of_frost_str: self.heart_of_frost,
         }
 
     @property

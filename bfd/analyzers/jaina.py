@@ -7,13 +7,14 @@ from collections import defaultdict
 
 class JainaAnalyzer(BossAnalyzer):
     SCORE_OBJ = JainaScore
-    STOP_AT_DEATH = 3
+    STOP_AT_DEATH = 4
 
-    AVALANCHE_SCORE = 30
+    AVALANCHE_SCORE = 20
     ICEBLOCK_SCORE = 30
     BOMBARD_SCORE = 25
     FREEZING_BLAST = 20
     GLACIAL_RAY = 30
+    HEART_OF_FROST = 40
 
     def analyze(self):
         print("Analyzing {}".format(self.wcl_fight))
@@ -24,6 +25,7 @@ class JainaAnalyzer(BossAnalyzer):
         self.bombard()
         self.glacial_ray()
         self.freezing_blast()
+        self.heart_of_frost()
         self.cleanup()
         self.save_score_objs()
 
@@ -41,7 +43,7 @@ class JainaAnalyzer(BossAnalyzer):
             if last_hit.get(event.target, 0) >= event.timestamp - 1200:
                 times_hit[event.target] += 1
                 if times_hit[event.target] >= 2:
-                    points = min(3 ** (times_hit[event.target]), 80)
+                    points = min(2 ** (times_hit[event.target]), 50)
                     self.score_objs.get(event.target).standing_in_fire -= points
                     self.create_score_event(event.timestamp, "stood in fire (tick {})".format(times_hit[event.target]),
                                             event.target, points)
@@ -117,4 +119,33 @@ class JainaAnalyzer(BossAnalyzer):
             self.score_objs.get(event.target).glacial_ray -= self.GLACIAL_RAY
             self.create_score_event(event.timestamp, "got hit by glacial ray",
                                     event.target, self.GLACIAL_RAY)
+
+    def heart_of_frost(self):
+        heart_of_frost_timings = defaultdict(list)
+        for event in self.client.get_events(self.wcl_fight,
+                                            filters={
+                                                "type": [WCLEventTypes.apply_debuff],
+                                                "ability.name": "Heart of Frost"
+                                            }, actors_obj_dict=self.actors):
+            heart_of_frost_timings[event.target].append((event.timestamp, event.timestamp+12000))
+        for event in self.client.get_events(self.wcl_fight,
+                                            filters={
+                                                "type": [WCLEventTypes.damage],
+                                                "ability.name": "Heart of Frost"
+                                            }, actors_obj_dict=self.actors):
+            for caster, timestamps in heart_of_frost_timings.items():
+                if self.between_multiple_durations(event.timestamp, timestamps):
+
+                    s1 = self.get_player_status_at_time(caster, event.timestamp, cache=True)
+                    s2 = self.get_player_status_at_time(event.target, event.timestamp, cache=True)
+                    if s1 and s2:
+                        dist = self.distance_calculation(s1.location, s2.location)
+                        if dist < 0.05:
+                            self.score_objs.get(caster).heart_of_frost -= self.HEART_OF_FROST
+                            self.create_score_event(event.timestamp,
+                                                    "hit {} with heart of frost".format(event.target.safe_name),
+                                                    caster, self.HEART_OF_FROST)
+
+
+
 

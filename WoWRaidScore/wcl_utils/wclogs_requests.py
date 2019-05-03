@@ -128,8 +128,8 @@ class WCLRequests(object):
     @staticmethod
     def build_single_filter_param(filter_name, filter_value):
         if isinstance(filter_value, tuple):
-            return "{}{}\"{}\"".format(filter_name, filter_value[0], filter_value[1])
-        return "{}=\"{}\"".format(filter_name, filter_value)
+            return u"{}{}\"{}\"".format(filter_name, filter_value[0], filter_value[1])
+        return u"{}=\"{}\"".format(filter_name, filter_value)
 
     @staticmethod
     def build_filter_param(filter_name, filter_value):
@@ -142,12 +142,12 @@ class WCLRequests(object):
     def _build_filters(filters):
         if filters:
             if isinstance(filters, list):
-                return "&filter=" + " OR ".join(["({})".format(WCLRequests._to_url(" AND ".join([WCLRequests.build_filter_param(filter_name, filter_value) for
+                return u"&filter=" + u" OR ".join([u"({})".format(WCLRequests._to_url(u" AND ".join([WCLRequests.build_filter_param(filter_name, filter_value) for
                                                   filter_name, filter_value in filter.items()]))) for filter in filters])
             else:
-                return "&filter=" + WCLRequests._to_url(" AND ".join([WCLRequests.build_filter_param(filter_name, filter_value) for
+                return u"&filter=" + WCLRequests._to_url(u" AND ".join([WCLRequests.build_filter_param(filter_name, filter_value) for
                                                   filter_name, filter_value in filters.items()]))
-        return ""
+        return u""
 
     def _get_json_data_from_wcl(self, url, max_attempts=5):
         json_data = None
@@ -166,11 +166,11 @@ class WCLRequests(object):
         return json_data
 
     def _get_event_json(self, start_time, end_time, actor_id, filters):
-        additional_data = "{actor_id}{filter}".format(
-            actor_id="&actorid={}".format(actor_id) if actor_id else "",
+        additional_data = u"{actor_id}{filter}".format(
+            actor_id=u"&actorid={}".format(actor_id) if actor_id else "",
             filter=WCLRequests._build_filters(filters))
 
-        url = "{base_url}/report/events/{raid_id}?api_key={api_key}&start={start_time}&end={end_time}{additional}".format(
+        url = u"{base_url}/report/events/{raid_id}?api_key={api_key}&start={start_time}&end={end_time}{additional}".format(
             base_url=WCLRequests.base_url(),
             raid_id=self.raid_id,
             api_key=API_KEY,

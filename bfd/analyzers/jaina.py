@@ -10,11 +10,11 @@ class JainaAnalyzer(BossAnalyzer):
     STOP_AT_DEATH = 4
 
     AVALANCHE_SCORE = 20
-    ICEBLOCK_SCORE = 30
+    ICEBLOCK_SCORE = 20
     BOMBARD_SCORE = 25
     FREEZING_BLAST = 20
     GLACIAL_RAY = 30
-    HEART_OF_FROST = 40
+    HEART_OF_FROST = 10
 
     def analyze(self):
         print("Analyzing {}".format(self.wcl_fight))
@@ -72,19 +72,31 @@ class JainaAnalyzer(BossAnalyzer):
         for event in self.client.get_events(self.wcl_fight,
                                             filters={
                                                 "type": [WCLEventTypes.apply_debuff],
-                                                "ability.name": "Frozen Solid"
+                                                "ability.name": "Frozen Solid",
+                                                "encounterPhase": ("<", 5),
                                             }, actors_obj_dict=self.actors):
             if self.check_for_wipe(event, death_count=self.STOP_AT_DEATH):
                 return
             self.score_objs.get(event.target).ice_blocked -= self.ICEBLOCK_SCORE
             self.create_score_event(event.timestamp, "got iceblocked",
                                     event.target, self.ICEBLOCK_SCORE)
+        for event in self.client.get_events(self.wcl_fight,
+                                            filters={
+                                                "type": [WCLEventTypes.apply_debuff],
+                                                "ability.name": "Frozen Solid",
+                                                "encounterPhase": (">", 4),
+                                            }, actors_obj_dict=self.actors):
+            if self.check_for_wipe(event, death_count=self.STOP_AT_DEATH):
+                return
+            self.score_objs.get(event.target).ice_blocked -= self.ICEBLOCK_SCORE * 6
+            self.create_score_event(event.timestamp, "got iceblocked in P3",
+                                    event.target, self.ICEBLOCK_SCORE * 6)
 
     def bombard(self):
         for event in self.client.get_events(self.wcl_fight,
                                             filters={
                                                 "type": [WCLEventTypes.damage],
-                                                "ability.name": "Bombard"
+                                                "ability.name": "Bombard",
                                             }, actors_obj_dict=self.actors):
             if self.check_for_wipe(event, death_count=self.STOP_AT_DEATH):
                 return
@@ -145,7 +157,3 @@ class JainaAnalyzer(BossAnalyzer):
                             self.create_score_event(event.timestamp,
                                                     "hit {} with heart of frost".format(event.target.safe_name),
                                                     caster, self.HEART_OF_FROST)
-
-
-
-

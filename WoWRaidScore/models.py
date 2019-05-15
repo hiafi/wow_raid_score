@@ -18,7 +18,7 @@ class Player(models.Model):
         app_label = "WoWRaidScore"
 
     def __str__(self):
-        return "<Player {}>".format(self.safe_name)
+        return "<Player {} - {}>".format(self.safe_name, self.id)
 
     @property
     def safe_name(self):

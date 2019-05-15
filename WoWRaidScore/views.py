@@ -1,6 +1,8 @@
 # -*- coding: utf-8 -*-
 from __future__ import unicode_literals
 
+import datetime
+
 from celery.result import AsyncResult
 from collections import defaultdict
 
@@ -82,25 +84,29 @@ def player_overview(request, player_id):
                 continue
         except ObjectDoesNotExist:
             continue
-        date_str = str(score.fight.date_parsed.strftime("%Y-%m-%d"))
-        dates.add(date_str)
+        date = score.fight.date_parsed
+        dates.add(date)
         if score.fight.boss not in sorted_scores:
             sorted_scores[score.fight.boss] = {}
-        if date_str not in sorted_scores[score.fight.boss]:
-            sorted_scores[score.fight.boss][date_str] = []
-        sorted_scores[score.fight.boss][date_str].append(score.total)
+        if date not in sorted_scores[score.fight.boss]:
+            sorted_scores[score.fight.boss][date] = []
+        sorted_scores[score.fight.boss][date].append(score.total)
 
     new_sort = {}
-    dates = sorted([d for d in dates])
+    start_date = min(dates)
+    end_date = max(dates)
+    # dates = [(start_date + datetime.timedelta(days=x)) for x in range(0, (end_date - start_date).days)]
+    dates = sorted(dates)
+
     for boss, date_scores in sorted_scores.items():
         for date in dates:
-
             if boss not in new_sort:
                 new_sort[boss] = []
             if date not in date_scores:
-                new_sort[boss].append(0)
+                new_sort[boss].append(None)
             else:
                 new_sort[boss].append(sum(date_scores[date]) / len(date_scores[date]))
+    dates = [d.strftime("%Y-%m-%d") for d in dates]
 
     return render(request, "player_overview_view.html", {"player": player, "scores": new_sort, "dates": dates})
 

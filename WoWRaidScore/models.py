@@ -18,7 +18,7 @@ class Player(models.Model):
         app_label = "WoWRaidScore"
 
     def __str__(self):
-        return "<Player {}>".format(self.name)
+        return "<Player {}>".format(self.safe_name)
 
     @property
     def safe_name(self):
@@ -98,7 +98,7 @@ class RaidScore(models.Model):
     objects = InheritanceManager()
 
     def __str__(self):
-        return "<ScoreObj: {} - {}>".format(self.fight, self.player)
+        return "<ScoreObj: {} ({}) - {}>".format(self.fight, self.total, self.player)
 
     @property
     def base_score(self):

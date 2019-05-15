@@ -363,7 +363,7 @@ class BlockadeScore(RaidScore):
     @property
     def score_dict(self):
         return {
-            self.voltaic_flash_str: self.voltaic_flash,
+            # self.voltaic_flash_str: self.voltaic_flash,
             self.sea_swell_str: self.sea_swell,
             self.sea_storm_str: self.sea_storm,
             self.torrential_swell_str: self.torrential_swell,

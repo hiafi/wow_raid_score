@@ -8,6 +8,7 @@ from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
 from django.http import HttpResponse
 from django.shortcuts import render
+from django.core.exceptions import ObjectDoesNotExist
 
 import json
 import logging
@@ -68,6 +69,40 @@ def view_raid(request, raid_id):
 
     return render(request, "raid_view.html", {"players": players, "score_objs": score_objs, "boss_order": bosses,
                                               "avg_scores": sorted_scores, "final_totals": final_totals, "raid": raid})
+
+
+def player_overview(request, player_id):
+    player = Player.objects.get(id=player_id)
+    scores = RaidScore.objects.filter(player=player).select_subclasses()
+    sorted_scores = {}
+    dates = set()
+    for score in scores:
+        try:
+            if not score.fight:
+                continue
+        except ObjectDoesNotExist:
+            continue
+        date_str = str(score.fight.date_parsed.strftime("%Y-%m-%d"))
+        dates.add(date_str)
+        if score.fight.boss not in sorted_scores:
+            sorted_scores[score.fight.boss] = {}
+        if date_str not in sorted_scores[score.fight.boss]:
+            sorted_scores[score.fight.boss][date_str] = []
+        sorted_scores[score.fight.boss][date_str].append(score.total)
+
+    new_sort = {}
+    dates = sorted([d for d in dates])
+    for boss, date_scores in sorted_scores.items():
+        for date in dates:
+
+            if boss not in new_sort:
+                new_sort[boss] = []
+            if date not in date_scores:
+                new_sort[boss].append(0)
+            else:
+                new_sort[boss].append(sum(date_scores[date]) / len(date_scores[date]))
+
+    return render(request, "player_overview_view.html", {"player": player, "scores": new_sort, "dates": dates})
 
 
 def _get_totals_for_player(score_objs):

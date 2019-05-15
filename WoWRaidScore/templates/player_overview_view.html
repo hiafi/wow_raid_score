@@ -1,0 +1,53 @@
+{% extends 'base_template.html' %}
+{% load dict_lookup %}
+{% block title %}Raid {{raid.raid_id}}{% endblock %}
+{% block content %}
+
+    <div>
+    {{ player.safe_name }} {{ player.server }}
+    </div>
+    {% for date, boss_scores in scores.items %}
+        {% for boss, score in boss_scores.items %}
+            <div>{{ boss }} {{ date }} - {{ score }}</div>
+        {% endfor %}
+    {% endfor %}
+
+    <div id="score_chart_div">
+        <canvas id="score_chart" width="400" height="200"></canvas>
+    </div>
+
+    <script>
+    let labels = {{ dates|safe }};
+    const colors = ["red", "orange", "yellow", "green", "blue", "purple", "black", "#006666", "#00cccc", "#660033", "#666600", "#990066", "#993333", "#99cc66"];
+    let boss_scores = [
+        {% for boss, score_avgs in scores.items %}
+        {
+            data: {{ score_avgs }},
+            label: "{{boss.name}}",
+            fill: false,
+            borderColor: colors[{{ boss.ordering }}]
+        },
+        {% endfor %}
+    ];
+    var ctx = document.getElementById("score_chart").getContext('2d');
+    var myChart = new Chart(ctx, {
+        type: 'line',
+        data: {
+            labels: labels,
+            datasets: boss_scores
+        },
+        options: {
+            responsive: true,
+            tooltips: {
+                mode: 'index',
+                intersect: false
+            },
+            hover: {
+                mode: 'nearest',
+                intersect: true
+            }
+        }
+    });
+    </script>
+
+{% endblock %}

@@ -17,9 +17,9 @@ def update_raid_task(raid_id, user, group):
     update_raid_to_current(raid_id, user, group)
 
 
-def update_status(progress, update_progress=True):
+def update_status(progress, update_progress=True, state="", message=""):
     if update_progress:
-        current_task.update_state(state='PROGRESS', meta={'process_percent': progress})
+        current_task.update_state(state='PROGRESS', meta={'process_percent': progress, "message": message})
 
 
 def get_progress(current_analyzer, num_analyzers, percentage_start):
@@ -54,18 +54,21 @@ def _get_raid_obj(wcl_client, raid_id, user_id, group_id, delete_fights, overwri
 
 def parse_raid_task(raid_id, user_id, group_id, overwrite=True, update_progress=True):
     wcl_client = WCLRequests(raid_id)
-    update_status(0.0, update_progress)
+    update_status(0.0, update_progress, message="Getting Raid Data")
     raid = _get_raid_obj(wcl_client, raid_id, user_id, group_id, delete_fights=True, overwrite=overwrite)
-    update_status(2.0, update_progress)
+    update_status(2.0, update_progress, message="Getting Fights")
     fights = wcl_client.get_fights()
-    update_status(5.0, update_progress)
+    update_status(5.0, update_progress, message="Building Analyzers")
     analyzers = build_analyzers(fights, raid, wcl_client)
-    update_status(10.0, update_progress)
+    update_status(10.0, update_progress, message="Processing Fights")
     num_analyzers = len(analyzers)
-    for index, analyzer in enumerate(analyzers):
-        analyzer.analyze()
-        progress = 10.0 + get_progress(index, num_analyzers, 90.0)
-        update_status(progress, update_progress)
+    try:
+        for index, analyzer in enumerate(analyzers):
+            analyzer.analyze()
+            progress = 10.0 + get_progress(index, num_analyzers, 90.0)
+            update_status(progress, update_progress, message="Processing Fights")
+    except Exception:
+        update_status(100.0, message="Unexpected Error")
 
 
 def update_raid_to_current(raid_id, user_id, group_id, update_progress=True):

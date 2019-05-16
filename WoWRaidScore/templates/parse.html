@@ -24,6 +24,7 @@
             }).done(function(json_str) {
                 percent = json_str["process_percent"];
                 $("#progressbar").progressbar({value: percent});
+                $("#progress_status").text(json_str["message"]);
                 if (percent >= 100.0) {
                     clearInterval(status_func);
                     $("#progress_status").text("Finished");

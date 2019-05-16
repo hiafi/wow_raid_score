@@ -68,7 +68,7 @@ def parse_raid_task(raid_id, user_id, group_id, overwrite=True, update_progress=
             progress = 10.0 + get_progress(index, num_analyzers, 90.0)
             update_status(progress, update_progress, message="Processing Fights")
     except Exception:
-        update_status(100.0, message="Unexpected Error")
+        update_status(99.0, message="Unexpected Error")
 
 
 def update_raid_to_current(raid_id, user_id, group_id, update_progress=True):

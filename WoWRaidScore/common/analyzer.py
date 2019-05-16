@@ -159,6 +159,8 @@ class BossAnalyzer(object):
         if not time_to_check:
             return False
         for (start_time, end_time) in durations:
+            if start_time is None or end_time is None:
+                continue
             if start_time <= time_to_check <= end_time:
                 return True
         return False

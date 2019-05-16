@@ -25,7 +25,7 @@
             data: [{% for score in score_avgs %}{% if score %} {{ score }} {% else %} NaN {% endif %},{% endfor %}],
             label: "{{boss.name}}",
             fill: false,
-            borderColor: colors[{{ boss.ordering }}],
+            borderColor: colors[{{ boss.ordering }}]
         },
         {% endfor %}
     ];

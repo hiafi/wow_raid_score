@@ -84,7 +84,7 @@ def player_overview(request, player_id):
                 continue
         except ObjectDoesNotExist:
             continue
-        date = score.fight.date_parsed
+        date = score.fight.raid.time
         dates.add(date)
         if score.fight.boss not in sorted_scores:
             sorted_scores[score.fight.boss] = {}

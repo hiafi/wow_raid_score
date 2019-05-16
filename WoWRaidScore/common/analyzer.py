@@ -156,6 +156,8 @@ class BossAnalyzer(object):
 
     @staticmethod
     def between_multiple_durations(time_to_check, durations):
+        if not time_to_check:
+            return False
         for (start_time, end_time) in durations:
             if start_time <= time_to_check <= end_time:
                 return True

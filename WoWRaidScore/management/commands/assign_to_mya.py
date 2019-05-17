@@ -12,3 +12,4 @@ class Command(BaseCommand):
         group = Group.objects.get(id=1)
         for raid in raids:
             raid.group = group
+            raid.save()

@@ -87,7 +87,7 @@
                     data: data,
                     label: player,
                     fill: false,
-                    borderColor: colors[color_index],
+                    borderColor: player === "Average"? "gold" : colors[color_index],
                     hidden: player !== "Average"
                 });
                 color_index++;

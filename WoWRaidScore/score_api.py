@@ -41,11 +41,13 @@ def group_overview(request, group_id):
         for player, scores in raid_scores.items():
             output[player][date_val] = sum(scores) / len(scores)
         avg = 0
+        count = 0
         for player in output.keys():
             if date_val in output[player]:
                 avg += output[player][date_val]
+                count += 1
 
-        output["Average"][date_val] = avg / len(output.keys())
+        output["Average"][date_val] = avg / count
     return HttpResponse(json.dumps({
         "dates": sorted(dates),
         "scores": output

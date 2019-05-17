@@ -22,12 +22,13 @@ logger = logging.getLogger(__name__)
 
 
 def group_overview(request, group_id):
+    boss_id = request.GET.get("boss_id")
     group = Group.objects.get(id=group_id)
     raids = Raid.objects.filter(group=group)
     output = defaultdict(dict)
     for raid in raids:
         raid_scores = defaultdict(list)
-        fights = Fight.objects.filter(raid=raid)
+        fights = Fight.objects.filter(raid=raid, boss__id=boss_id)
         for fight in fights:
             scores = RaidScore.objects.filter(fight=fight).select_subclasses()
             for score in scores:
@@ -39,6 +40,18 @@ def group_overview(request, group_id):
         "dates": sorted([r.time.strftime("%Y-%m-%d") for r in raids]),
         "scores": output
     }), content_type='application/json')
+
+
+def get_bosses(request, zone_id):
+
+    return HttpResponse(json.dumps([
+        {
+            "name": b.name,
+            "id": b.id,
+            "order": b.ordering,
+        } for b in Boss.objects.filter(zone_id=zone_id).order_by("ordering")]),
+    content_type='application/json')
+
 
 
 def player_overview(request, player_id):

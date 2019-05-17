@@ -21,4 +21,5 @@ urlpatterns = [
 
     # API
     url(r'^api\/group\/(?P<group_id>\d+)\/$', score_api.group_overview, name="api_group_overview"),
+    url(r'^api\/bosses\/(?P<zone_id>\d+)\/$', score_api.get_bosses, name="get_bosses"),
 ]

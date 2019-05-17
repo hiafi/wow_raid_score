@@ -3,6 +3,11 @@
 {% block title %}Groups {{raid.raid_id}}{% endblock %}
 {% block content %}
 
+    <div>
+    <select id="boss_id" disabled="disabled">
+        <option>None Available</option>
+    </select>
+    </div>
     <div id="score_chart_div">
         <canvas id="score_chart" width="400" height="200"></canvas>
     </div>
@@ -43,36 +48,55 @@
         }
     });
     $.ajax({
-        url: '{% url "api_group_overview" group %}',
+        url: '{% url "get_bosses" 21 %}',
         method: "GET",
-        data: {csrfmiddlewaretoken: "{{ csrf_token }}", "group_id": {{ group }} }
+        data: {csrfmiddlewaretoken: "{{ csrf_token }}"}
     }).done(function(response) {
         console.log(response);
-        labels = response.dates;
-        boss_scores = [];
-        let color_index = 0;
-        for (const player of Object.keys(response.scores)) {
-            let data = [];
-            for (const date in response.dates) {
-                const val = response.scores[player][response.dates[date]];
-                if (val) {
-                    data.push(val)
-                } else {
-                    data.push(NaN);
-                }
-            }
-            boss_scores.push({
-                data: data,
-                label: player,
-                fill: false,
-                borderColor: colors[color_index]
-            });
-            color_index++;
+        const options = $("#boss_id");
+        options.prop('disabled', 'disabled');
+        options.find('option').remove();
+        for (const data of response) {
+            options.append($("<option></option>").attr("value", data.id).text(data.name));
         }
-        myChart.data.labels = labels;
-        myChart.data.datasets = boss_scores;
-        myChart.update()
+        options.prop('disabled', false);
     });
+    $("#boss_id").change(function() {
+        console.log($(this).val());
+        let boss_id = 23;
+        $.ajax({
+            url: '{% url "api_group_overview" group %}',
+            method: "GET",
+            data: {csrfmiddlewaretoken: "{{ csrf_token }}", "group_id": {{ group }}, boss_id: $(this).val() }
+        }).done(function(response) {
+            console.log(response);
+            labels = response.dates;
+            boss_scores = [];
+            let color_index = 0;
+            for (const player of Object.keys(response.scores)) {
+                let data = [];
+                for (const date in response.dates) {
+                    const val = response.scores[player][response.dates[date]];
+                    if (val) {
+                        data.push(val)
+                    } else {
+                        data.push(NaN);
+                    }
+                }
+                boss_scores.push({
+                    data: data,
+                    label: player,
+                    fill: false,
+                    borderColor: colors[color_index]
+                });
+                color_index++;
+            }
+            myChart.data.labels = labels;
+            myChart.data.datasets = boss_scores;
+            myChart.update()
+        });
+    });
+
     </script>
 
 {% endblock %}

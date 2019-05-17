@@ -30,15 +30,20 @@ def group_overview(request, group_id):
     for raid in raids:
         raid_scores = defaultdict(list)
         fights = Fight.objects.filter(raid=raid, boss__id=boss_id)
+        date_val = raid.time.strftime("%Y-%m-%d")
         if len(fights) > 0:
-            dates.append(raid.time.strftime("%Y-%m-%d"))
+            dates.append(date_val)
         for fight in fights:
             scores = RaidScore.objects.filter(fight=fight).select_subclasses()
             for score in scores:
                 raid_scores[score.player.safe_name].append(score.total)
         for player, scores in raid_scores.items():
-            output[player][raid.time.strftime("%Y-%m-%d")] = sum(scores) / len(scores)
-
+            output[player][date_val] = sum(scores) / len(scores)
+        avg = 0
+        for player in output.keys():
+            if date_val in output[player]:
+                avg += output[player][date_val]
+        output["Average"][date_val] = avg / len(output.keys())
     return HttpResponse(json.dumps({
         "dates": sorted(dates),
         "scores": output

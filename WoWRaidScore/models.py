@@ -48,6 +48,9 @@ class Group(models.Model):
     short_name = models.SlugField(max_length=10)
     user_access = models.ManyToManyField(User)
 
+    def __str__(self):
+        return "<RaidGroup {}: ({})>".format(self.name, self.user_access)
+
 
 class Raid(models.Model):
     raid_id = models.CharField(max_length=30)

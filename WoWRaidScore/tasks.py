@@ -28,9 +28,12 @@ def get_progress(current_analyzer, num_analyzers, percentage_start):
 
 def _get_raid_obj(wcl_client, raid_id, user_id, group_id, delete_fights, overwrite):
     user = User.objects.get(id=user_id)
-    if group_id:
-        group = Group.objects.get(id=group_id)
-    else:
+    try:
+        if group_id:
+            group = Group.objects.get(id=group_id)
+        else:
+            group = None
+    except Exception:
         group = None
     try:
         raid = Raid.objects.get(raid_id=raid_id)

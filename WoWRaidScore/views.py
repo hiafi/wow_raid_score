@@ -15,7 +15,7 @@ from django.core.exceptions import ObjectDoesNotExist
 import json
 import logging
 
-from WoWRaidScore.models import Raid, Fight, RaidScore, Player, Boss, FightEvent
+from WoWRaidScore.models import Raid, Fight, RaidScore, Player, Boss, FightEvent, Group
 from WoWRaidScore.tasks import parse_task, parse_raid_task, update_raid_to_current, update_raid_task
 from WoWRaidScore.wcl_utils.wclogs_requests import WCLRequests
 
@@ -139,6 +139,10 @@ def view_player_details_for_raid(request, raid_id, player_id, boss_id):
     return render(request, "player_raid_view.html", context)
 
 
+def group_overview(request, group_id):
+    return render(request, "group_overview.html", {"group": group_id})
+
+
 def view_player_death_count_times(request, raid_id):
     wcl_client = WCLRequests(raid_id)
     wcl_fights = wcl_client.get_fights()
@@ -158,7 +162,8 @@ def view_player_death_count_times(request, raid_id):
 
 @login_required
 def parse_raid(request):
-    return render(request, 'parse.html', {})
+    groups_for_user = Group.objects.filter(user_access__id=request.user.id)
+    return render(request, 'parse.html', {"groups": groups_for_user})
 
 
 def view_parse_progress(request, raid_id):
@@ -174,10 +179,9 @@ def view_parse_progress(request, raid_id):
 
 
 @login_required
-def parse_raid_legacy(request, raid_id):
-    group = None
+def parse_raid_legacy(request, raid_id, group_id):
     print("Starting parsing {}".format(raid_id))
-    parse_raid_task(raid_id, request.user.id, group, overwrite=True, update_progress=False)
+    parse_raid_task(raid_id, request.user.id, group_id, overwrite=True, update_progress=False)
     print("Finished.")
     return render(request, 'parse.html', {})
 

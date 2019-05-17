@@ -4,8 +4,14 @@
 <div>
 <span>Enter your raid ID here from warcraft logs: </span>
 <input label="raid_id" type="text" name="raid_id" id="raid_id">
+<select name="group_id" id="group_id">
+    {% for group in groups %}
+    <option value="{{ group.id }}">{{ group.name }}</option>
+    {% endfor %}
+</select>
 <input type="button" value="Start Parse" id="start_parse">
 <input type="button" value="Start Live Parsing" id="start_live">
+<input type="button" value="Legacy Parse" id="legacy_parse">
 </div>
 
 <div id="progressbar"></div>
@@ -17,6 +23,7 @@
     $("#start_parse").click(function() {
         $("#progressbar").progressbar({value: 0});
         var raid_id = $("#raid_id").val();
+        var group_id = $("#group_id").val();
         var status_func = setInterval(function() {
             $.ajax({
                 url: '/parse/status/'+raid_id+'/',
@@ -34,21 +41,35 @@
         $.ajax({
             url: '{% url "start_parse" %}',
             method: "POST",
-            data: {"raid_id": raid_id, csrfmiddlewaretoken: "{{ csrf_token }}"}
+            data: {"raid_id": raid_id, csrfmiddlewaretoken: "{{ csrf_token }}", "group_id": group_id }
         });
         $("#progress_status").text("Processing");
     });
 
     $("#start_live").click(function() {
         var raid_id = $("#raid_id").val();
+        var group_id = $("#group_id").val();
         var repeat_parse_func = setInterval(function() {
             $.ajax({
                 url: '{% url "live_parse" %}',
                 method: "POST",
-                data: {"raid_id": raid_id, csrfmiddlewaretoken: "{{ csrf_token }}"}
+                data: {"raid_id": raid_id, csrfmiddlewaretoken: "{{ csrf_token }}", "group_id": group_id}
             });
         }, 120000);
         $("#progress_status").text("Running Live...");
+    });
+
+    $("#legacy_parse").click(function() {
+        var raid_id = $("#raid_id").val();
+        var group_id = $("#group_id").val() || -1;
+        $("#progress_status").text("Starting");
+
+        $.ajax({
+            url: '/parse_legacy/'+raid_id+'/'+group_id+'/',
+            method: "get"
+        }).done(function(json_str) {
+            $("#progress_status").text("Finished");
+        });
     });
 
 </script>

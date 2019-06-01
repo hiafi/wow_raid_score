@@ -140,7 +140,8 @@ def view_player_details_for_raid(request, raid_id, player_id, boss_id):
 
 
 def group_overview(request, group_id):
-    return render(request, "group_overview.html", {"group": group_id})
+    raids = Raid.objects.filter(group_id=group_id).order_by("time")
+    return render(request, "group_overview.html", {"group": group_id, "raids": raids})
 
 
 def view_player_death_count_times(request, raid_id):

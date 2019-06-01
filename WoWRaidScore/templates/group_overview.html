@@ -1,5 +1,5 @@
 {% extends 'base_template.html' %}
-{% load dict_lookup %}
+{% load tz %}
 {% block title %}Groups {{raid.raid_id}}{% endblock %}
 {% block content %}
 
@@ -10,6 +10,12 @@
     </div>
     <div id="score_chart_div">
         <canvas id="score_chart" width="400" height="200"></canvas>
+    </div>
+
+    <div>
+    {% for raid in raids %}
+        <div><a href='{% url "view_raid" raid_id=raid.raid_id %}'>{{raid.time|localtime}} - {{ raid.raid_id }}</a></div>
+    {% endfor %}
     </div>
 
     <script>

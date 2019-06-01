@@ -6,6 +6,8 @@ from django.contrib.auth.models import User
 from WoWRaidScore.common.analyzer_builder import build_analyzers
 from WoWRaidScore.models import Raid, Fight, RaidScore, Group, FightEvent
 
+import traceback
+
 
 @shared_task()
 def parse_task(raid_id, user, group):
@@ -70,8 +72,9 @@ def parse_raid_task(raid_id, user_id, group_id, overwrite=True, update_progress=
             analyzer.analyze()
             progress = 10.0 + get_progress(index, num_analyzers, 90.0)
             update_status(progress, update_progress, message="Processing Fights")
-    except Exception:
-        update_status(99.0, message="Unexpected Error")
+    except Exception as e:
+        traceback.print_exc()
+        update_status(99.0, update_progress, message="Unexpected Error")
 
 
 def update_raid_to_current(raid_id, user_id, group_id, update_progress=True):

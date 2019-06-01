@@ -339,13 +339,10 @@ class MekkatorqueScore(RaidScore):
 
 class BlockadeScore(RaidScore):
     sea_swell = models.IntegerField(default=0)
-    sea_storm = models.IntegerField(default=0)
-    torrential_swell = models.IntegerField(default=0)
+    ire_of_the_deep = models.IntegerField(default=0)
 
-    voltaic_flash_str = "Voltaic Flash"
     sea_swell_str = "Sea Swell"
-    sea_storm_str = "Sea Storm"
-    torrential_swell_str = "Torrential Swell"
+    ire_of_the_deep_str = "Ire of the Deep"
 
     @property
     def base_score(self):
@@ -354,28 +351,22 @@ class BlockadeScore(RaidScore):
     @property
     def table_keys(self):
         return [
-            self.voltaic_flash_str,
             self.sea_swell_str,
-            self.sea_storm_str,
-            self.torrential_swell_str,
+            self.ire_of_the_deep_str,
         ]
 
     @property
     def score_dict(self):
         return {
-            # self.voltaic_flash_str: self.voltaic_flash,
             self.sea_swell_str: self.sea_swell,
-            self.sea_storm_str: self.sea_storm,
-            self.torrential_swell_str: self.torrential_swell,
+            self.ire_of_the_deep_str: self.ire_of_the_deep,
         }
 
     @property
     def score_description(self):
         return {
-            self.voltaic_flash_str: "",
             self.sea_swell_str: "",
-            self.sea_storm_str: "",
-            self.torrential_swell_str: "",
+            self.ire_of_the_deep_str: "",
         }
 
 

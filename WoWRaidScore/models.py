@@ -92,7 +92,7 @@ class RaidScore(models.Model):
     fight = models.ForeignKey(Fight)
     player = models.ForeignKey(Player)
 
-    spec = models.IntegerField()
+    spec = models.IntegerField(null=True)
     melee_dps = models.BooleanField()
     ranged_dps = models.BooleanField()
     tank = models.BooleanField()

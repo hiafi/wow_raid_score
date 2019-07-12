@@ -57,7 +57,7 @@
         }
     });
     $.ajax({
-        url: '{% url "get_bosses" 21 %}',
+        url: '{% url "get_bosses" 23 %}',
         method: "GET",
         data: {csrfmiddlewaretoken: "{{ csrf_token }}"}
     }).done(function(response) {

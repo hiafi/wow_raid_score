@@ -6,6 +6,34 @@ from django.db import models
 from WoWRaidScore.models import RaidScore
 
 
+class CommanderScore(RaidScore):
+    bolts = models.IntegerField(default=0)
+
+    bolts_str = "Bolts"
+
+    @property
+    def base_score(self):
+        return 100
+
+    @property
+    def table_keys(self):
+        return [
+            self.bolts_str,
+        ]
+
+    @property
+    def score_dict(self):
+        return {
+            self.bolts_str: self.bolts,
+        }
+
+    @property
+    def score_description(self):
+        return {
+            self.bolts_str: "Getting hit by flames of punishment while on the fire side (right side). The best way to handle this mechanic is to stand in melee range right behind the boss.",
+        }
+
+
 class AzsharaScore(RaidScore):
     sanction = models.IntegerField(default=0)
     beckon = models.IntegerField(default=0)
